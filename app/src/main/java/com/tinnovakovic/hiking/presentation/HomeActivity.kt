@@ -1,8 +1,7 @@
 package com.tinnovakovic.hiking.presentation
 
 import android.Manifest
-import android.app.Application
-import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -12,8 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.tinnovakovic.hiking.data.LocationService
-import com.tinnovakovic.hiking.presentation.homeScreen
 import com.tinnovakovic.hiking.shared.Destination
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,14 +20,7 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-            ),
-            0
-        )
+        requestLocationAndNotificationPermissions()
 
         setContent {
             val navController = rememberNavController()
@@ -44,5 +34,22 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun requestLocationAndNotificationPermissions() {
+        val permissions = arrayOf(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ).toMutableList()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
+        ActivityCompat.requestPermissions(
+            this,
+            permissions.toTypedArray(),
+            0
+        )
     }
 }

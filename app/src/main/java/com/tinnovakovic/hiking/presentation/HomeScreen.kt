@@ -1,15 +1,12 @@
 package com.tinnovakovic.hiking.presentation
 
-import android.app.Application
-import android.content.Intent
+
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.tinnovakovic.hiking.data.LocationService
 import com.tinnovakovic.hiking.shared.DestroyLifecycleHandler
 
 @Composable
@@ -52,3 +49,6 @@ const val TIME_BETWEEN_UPDATES = 1L // one seconds
 // --The use of foreground service must be initiated as a continuation of an in-app, user-initiated action.
 // --The use of foreground service must be terminated immediately after the application completes the intended use case of the user-initiated action.
 // --Link: https://support.google.com/googleplay/android-developer/answer/9799150#Accessing%20location%20in%20the%20foreground
+
+//TODO:
+// -- Ask user for notification permissions - DONE

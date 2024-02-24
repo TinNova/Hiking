@@ -24,7 +24,7 @@ class LocationService: Service()  {
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private lateinit var locationClient: LocationClient
     override fun onBind(p0: Intent?): IBinder? {
-        TODO("Not yet implemented")
+        return null
     }
 
     override fun onCreate() {
@@ -50,17 +50,16 @@ class LocationService: Service()  {
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setOngoing(true) //so you can't swipe it away
 
-
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         locationClient
             .getLocationUpdates()
             .catch { e -> e.printStackTrace() }
             .onEach { location ->
-                Log.d("TINTIN", "LocationService: location: $location")
                 val updatedNotification = notification.setContentText(
                     "Location recently updated"
                 )
+                Log.d("TINTIN", "LocationService: location: $location")
                 notificationManager.notify(LOCATION_NOTIFICATION_ID, updatedNotification.build())
             }
             .launchIn(serviceScope)
