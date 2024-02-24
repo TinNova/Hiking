@@ -2,8 +2,16 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
-    id("dagger.hilt.android.plugin")
+    id("com.google.dagger.hilt.android")
 }
+
+val composeVersion = "1.6.1"
+val lifecycleVersion = "2.7.0"
+val retrofitVersion = "2.9.0"
+val jUnitVersion = "5.7.2"
+val mockkVersion = "1.12.2"
+val okHttp = "4.11.0"
+val hiltVersion = "2.50"
 
 android {
     namespace = "com.tinnovakovic.hiking"
@@ -35,20 +43,29 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.0"
+    }
+
 }
 
 dependencies {
 
-    val composeVersion = "1.5.0"
-    val lifecycleVersion = "2.6.1"
-    val retrofitVersion = "2.9.0"
-    val jUnitVersion = "5.7.2"
-    val mockkVersion = "1.12.2"
-    val okHttp = "4.11.0"
+    implementation("com.google.android.gms:play-services-location:21.1.0")
+
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
+
+    //Location Services
+    implementation("com.google.android.gms:play-services-location:21.1.0")
+    implementation("com.google.android.gms:play-services-base:18.3.0")
 
 
     //Jetpack Compose
@@ -59,29 +76,40 @@ dependencies {
     implementation("androidx.compose.material:material:$composeVersion")
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
+//    implementation("androidx.compose.compiler:compiler:1.5.9")
+
 
     //Jetpack Compose Material Design Components
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion")
-    implementation("androidx.activity:activity-compose:1.7.2")
-    implementation("androidx.navigation:navigation-compose:2.7.1")
+
+    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
     implementation("io.coil-kt:coil-compose:2.4.0")
 
     //ViewModel For Jetpack Compose
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
     //Dagger Hilt
-    implementation("com.google.dagger:hilt-android:2.47")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
-    implementation("androidx.compose.material3:material3:1.1.1")
-    //Dagger Hilt Annotation Processor
-    kapt("com.google.dagger:hilt-compiler:2.47")
+    implementation("com.google.dagger:hilt-android:$hiltVersion")
+    kapt ("com.google.dagger:hilt-compiler:$hiltVersion")
+
+    // For instrumentation tests
+    androidTestImplementation  ("com.google.dagger:hilt-android-testing:$hiltVersion")
+    kaptAndroidTest ("com.google.dagger:hilt-compiler:$hiltVersion")
+
+    // For local unit tests
+    testImplementation ("com.google.dagger:hilt-android-testing:$hiltVersion")
+    kaptTest ("com.google.dagger:hilt-compiler:$hiltVersion")
+
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    implementation("androidx.compose.material3:material3:1.2.0")
+
 
     //Coroutines Core Package
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     //Coroutines Provides Dispatchers.Main and Logs Unhandled Exceptions
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -110,9 +138,17 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:$jUnitVersion")
 
     //Coroutines Provides Utilities For Testing Coroutines
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
     //Robolectric For UnitTesting The Android Framework
     testImplementation("org.robolectric:robolectric:4.7.3")
 
 }
+
+kapt {
+    correctErrorTypes = true
+}
+//    configurations.implementation {
+//        //TODO: This is a working solution, but it would be better to find where
+//        //this dependency duplication is coming from
+//        exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8") }
