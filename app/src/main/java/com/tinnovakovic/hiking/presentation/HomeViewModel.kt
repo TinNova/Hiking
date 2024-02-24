@@ -26,6 +26,9 @@ class HomeViewModel @Inject constructor(
                 }
             }
             is HomeContract.UiEvents.StopClicked -> {}
+            is HomeContract.UiEvents.OnDestroy -> {
+                stopLocationServiceUseCase.execute()
+            }
         }
     }
 

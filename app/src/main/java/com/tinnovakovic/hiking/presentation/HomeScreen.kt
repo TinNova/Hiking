@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tinnovakovic.hiking.data.LocationService
+import com.tinnovakovic.hiking.shared.DestroyLifecycleHandler
 
 @Composable
 fun HomeScreen() {
@@ -20,6 +21,10 @@ fun HomeScreen() {
         uiState = uiState,
         uiAction = viewModel::onUiEvent,
     )
+
+    DestroyLifecycleHandler {
+        viewModel.onUiEvent(HomeContract.UiEvents.OnDestroy)
+    }
 }
 
 @Composable

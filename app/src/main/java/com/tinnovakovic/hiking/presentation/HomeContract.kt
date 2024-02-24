@@ -19,5 +19,6 @@ interface HomeContract {
     sealed class UiEvents : BaseUiEvent {
         data object StartClicked : UiEvents()
         data object StopClicked : UiEvents()
+        data object OnDestroy : UiEvents()
     }
 }
