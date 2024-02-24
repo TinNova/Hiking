@@ -1,4 +1,4 @@
-package com.tinnovakovic.hiking.domain
+package com.tinnovakovic.hiking.data
 
 import android.annotation.SuppressLint
 import android.content.Context

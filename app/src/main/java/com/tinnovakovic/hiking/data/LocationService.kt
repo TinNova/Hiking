@@ -9,8 +9,6 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.LocationServices
 import com.tinnovakovic.hiking.R
-import com.tinnovakovic.hiking.domain.DefaultLocationClient
-import com.tinnovakovic.hiking.domain.LocationClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

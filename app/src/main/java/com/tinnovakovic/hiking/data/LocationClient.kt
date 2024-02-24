@@ -1,4 +1,4 @@
-package com.tinnovakovic.hiking.domain
+package com.tinnovakovic.hiking.data
 
 import android.location.Location
 import kotlinx.coroutines.flow.Flow
