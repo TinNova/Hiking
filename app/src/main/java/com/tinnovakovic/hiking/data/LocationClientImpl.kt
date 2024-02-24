@@ -12,16 +12,20 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
 import com.tinnovakovic.hiking.hasLocationPermission
 import com.tinnovakovic.hiking.presentation.TIME_BETWEEN_UPDATES
+import com.tinnovakovic.hiking.shared.ContextProvider
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class DefaultLocationClient(
-    private val context: Context,
+class LocationClientImpl @Inject constructor(
+    contextProvider: ContextProvider,
     private val client: FusedLocationProviderClient
 ): LocationClient {
+
+    private val context = contextProvider.getContext()
     @SuppressLint("MissingPermission")
     override fun getLocationUpdates(): Flow<Location> {
         return callbackFlow {

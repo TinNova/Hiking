@@ -7,8 +7,8 @@ import android.content.Intent
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.google.android.gms.location.LocationServices
 import com.tinnovakovic.hiking.R
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -16,21 +16,26 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class LocationService: Service()  {
 
+    @Inject
+    lateinit var locationClient: LocationClient
+
+    @Inject
+    lateinit var locationMemoryCache: LocationInMemoryCache
+
+
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private lateinit var locationClient: LocationClient
+//    private lateinit var locationClient: LocationClient
     override fun onBind(p0: Intent?): IBinder? {
         return null
     }
 
     override fun onCreate() {
         super.onCreate()
-        locationClient = DefaultLocationClient(
-            applicationContext,
-            LocationServices.getFusedLocationProviderClient(applicationContext)
-        )
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -59,6 +64,7 @@ class LocationService: Service()  {
                 )
                 Log.d("TINTIN", "LocationService: location: $location")
                 notificationManager.notify(LOCATION_NOTIFICATION_ID, updatedNotification.build())
+                locationMemoryCache.updateCache(location)
             }
             .launchIn(serviceScope)
 
