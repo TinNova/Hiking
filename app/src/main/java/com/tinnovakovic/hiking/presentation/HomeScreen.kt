@@ -1,10 +1,22 @@
 package com.tinnovakovic.hiking.presentation
 
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.R
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Scaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tinnovakovic.hiking.shared.DestroyLifecycleHandler
@@ -24,17 +36,26 @@ fun HomeScreen() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenContent(
     uiState: HomeContract.UiState,
     uiAction: (HomeContract.UiEvents) -> Unit,
 ) {
-    OutlinedButton(onClick = {
-        uiAction.invoke(HomeContract.UiEvents.StartClicked)
-    }) {
-        Text(text = "Start")
+
+    OutlinedButton(
+        onClick = {
+            if (uiState.isStartButton) {
+                uiAction.invoke(HomeContract.UiEvents.StartClicked)
+            } else {
+                uiAction.invoke(HomeContract.UiEvents.StopClicked)
+            }
+        }
+    ) {
+        Text(if (uiState.isStartButton) "Start" else "Stop")
     }
 }
+
 
 //TODO: We continue tracking even after app terminates...
 

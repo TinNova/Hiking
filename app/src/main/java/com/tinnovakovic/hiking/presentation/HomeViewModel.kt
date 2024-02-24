@@ -16,25 +16,28 @@ class HomeViewModel @Inject constructor(
 
     override val _uiState: MutableStateFlow<HomeContract.UiState> =
         MutableStateFlow(initialUiState())
+
     override fun onUiEvent(event: HomeContract.UiEvents) {
         when (event) {
             is HomeContract.UiEvents.StartClicked -> {
-                // 1st ensure the geofence and broadcastReceiver works with CleanArchitecture
-                // 2nd get users location and start the first geofence with it
-                viewModelScope.launch {
-                    startLocationServiceUseCase.execute()
+                startLocationServiceUseCase.execute()
+                updateUiState {
+                    it.copy(isStartButton = false)
                 }
             }
-            is HomeContract.UiEvents.StopClicked -> {}
-            is HomeContract.UiEvents.OnDestroy -> {
+            is HomeContract.UiEvents.StopClicked -> {
                 stopLocationServiceUseCase.execute()
+                updateUiState {
+                    it.copy(isStartButton = true)
+                }
             }
+            is HomeContract.UiEvents.OnDestroy -> stopLocationServiceUseCase.execute()
         }
     }
 
     private companion object {
         fun initialUiState() = HomeContract.UiState(
-            string = ""
+            isStartButton = true
         )
     }
 

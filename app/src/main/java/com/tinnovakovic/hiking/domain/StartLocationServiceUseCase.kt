@@ -1,7 +1,5 @@
 package com.tinnovakovic.hiking.domain
 
-import android.app.Activity
-import android.content.ContextWrapper
 import android.content.Intent
 import com.tinnovakovic.hiking.data.LocationService
 import com.tinnovakovic.hiking.shared.ContextProvider

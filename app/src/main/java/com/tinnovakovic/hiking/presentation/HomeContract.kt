@@ -11,7 +11,7 @@ interface HomeContract {
 
     @Immutable
     data class UiState(
-        val string: String
+        val isStartButton: Boolean
 //        val subjects: List<Subject>,
 //        val movies: List<Movie>
     ) : BaseUiState {}
