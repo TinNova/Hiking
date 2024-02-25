@@ -43,24 +43,7 @@ class HomeViewModel @Inject constructor(
                     it.copy(isStartButton = false, isError = false)
                 }
 
-                viewModelScope.launch(exceptionHandler) {
-
-                    var latestDistinctPhotos: Set<HikingPhoto> = setOf()
-                    locationInMemoryCache.cache.collect { latestLocation ->
-
-                        latestLocation?.let { location ->
-                            latestDistinctPhotos = photoFromLocationUseCase.execute(latestDistinctPhotos, location)
-                            updateUiState {
-                                it.copy(
-                                    hikingPhotos = latestDistinctPhotos.toMutableStateList()
-                                )
-                            }
-
-                            Log.d("TINTIN", "ViewModel LocationInMemoryCache: $location")
-                        }
-
-                    }
-                }
+                observeLocationAndFetchPhotos()
             }
 
             is HomeContract.UiEvents.StopClicked -> {
@@ -74,11 +57,33 @@ class HomeViewModel @Inject constructor(
             is HomeContract.UiEvents.OnResume -> {
                 updateUiState { it.copy(scrollStateToTop = true) }
             }
+
             is HomeContract.UiEvents.OnPause -> {
                 updateUiState { it.copy(scrollStateToTop = false) }
             }
         }
     }
+
+    private fun observeLocationAndFetchPhotos() {
+        viewModelScope.launch(exceptionHandler) {
+            var latestDistinctPhotos: Set<HikingPhoto> = setOf()
+            locationInMemoryCache.cache.collect { latestLocation ->
+
+                latestLocation?.let { location ->
+                    latestDistinctPhotos =
+                        photoFromLocationUseCase.execute(latestDistinctPhotos, location)
+                    updateUiState {
+                        it.copy(
+                            hikingPhotos = latestDistinctPhotos.toMutableStateList()
+                        )
+                    }
+
+                    Log.d("TINTIN", "ViewModel LocationInMemoryCache: $location")
+                }
+            }
+        }
+    }
+
 
     private companion object {
         fun initialUiState() = HomeContract.UiState(

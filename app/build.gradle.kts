@@ -10,14 +10,24 @@ plugins {
 val composeVersion = "1.6.1"
 val lifecycleVersion = "2.7.0"
 val retrofitVersion = "2.9.0"
-val jUnitVersion = "5.7.2"
-val mockkVersion = "1.12.2"
+val jUnitVersion = "5.8.2"
+val mockkVersion = "1.13.9"
 val okHttp = "4.11.0"
 val hiltVersion = "2.50"
 
 android {
     namespace = "com.tinnovakovic.hiking"
     compileSdk = 34
+
+    testOptions {
+        unitTests.all {
+            it.useJUnitPlatform()
+        }
+    }
+
+    packagingOptions {
+        resources.excludes.add("META-INF/*")
+    }
 
     buildFeatures {
         buildConfig = true
@@ -104,6 +114,7 @@ dependencies {
 
     //Dagger Hilt
     implementation("com.google.dagger:hilt-android:$hiltVersion")
+    implementation("org.junit.jupiter:junit-jupiter:5.8.2")
     kapt ("com.google.dagger:hilt-compiler:$hiltVersion")
 
     // For instrumentation tests
@@ -124,6 +135,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     testImplementation("junit:junit:4.13.2")
+    testImplementation("app.cash.turbine:turbine:1.0.0")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
@@ -146,11 +158,10 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:$jUnitVersion")
     //Junit5 Core Package
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$jUnitVersion")
-    //Junit5 For Parameterised Tests
-    testImplementation("org.junit.jupiter:junit-jupiter-params:$jUnitVersion")
 
     //Coroutines Provides Utilities For Testing Coroutines
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test-jvm:1.8.0")
 
     //Robolectric For UnitTesting The Android Framework
     testImplementation("org.robolectric:robolectric:4.7.3")

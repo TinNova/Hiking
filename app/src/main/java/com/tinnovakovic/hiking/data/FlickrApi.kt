@@ -10,7 +10,7 @@ interface FlickrApi {
     suspend fun getFlickrPhotosSearch(
         @Query("lat") lat: String,
         @Query("lon") lon: String
-    ): FlickrPhotos
+    ): FlickrPhotos?
 
 }
 

@@ -13,7 +13,7 @@ class GetPhotoFromLocationUseCase @Inject constructor(
         existingHikingPhotos: Set<HikingPhoto>,
         location: Location
     ): Set<HikingPhoto> {
-        val flickrPhoto = flickrRepo.getFlickrPhoto(location)
+        val flickrPhoto = flickrRepo.fetchFlickrPhoto(location) ?: return existingHikingPhotos
         val hikingPhotos = mapFlickrPhotoToHikingPhotosUseCase.execute(flickrPhoto)
 
         return addFirstDistinctPhotoToSetOrNone(existingHikingPhotos.toMutableSet(), hikingPhotos)
