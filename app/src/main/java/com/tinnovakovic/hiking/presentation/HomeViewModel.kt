@@ -24,11 +24,13 @@ class HomeViewModel @Inject constructor(
         when (event) {
             is HomeContract.UiEvents.StartClicked -> {
                 startLocationServiceUseCase.execute()
+
                 viewModelScope.launch {
                     locationInMemoryCache.cache.collect {
                         Log.d(
                             "TINTIN", "ViewModel LocationInMemoryCache: $it"
                         )
+                        //TODO: Fetch Images Now!
                     }
                 }
 

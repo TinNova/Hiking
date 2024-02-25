@@ -47,7 +47,6 @@ fun HomeScreenContent(
 //TODO: We continue tracking even after app terminates...
 
 
-const val TIME_BETWEEN_UPDATES = 1L // one seconds
 
 // Why To Avoid Background Location
 // --It feels like spying and Google wants to avoid this, instead use foreground service which will only work when activity is visible, or when not visible a notification is displayed whilst using their location
