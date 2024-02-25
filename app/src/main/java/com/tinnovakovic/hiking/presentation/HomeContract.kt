@@ -1,7 +1,7 @@
 package com.tinnovakovic.hiking.presentation
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.tinnovakovic.hiking.data.Photo
+import com.tinnovakovic.hiking.domain.HikingPhoto
 import com.tinnovakovic.hiking.shared.BaseUiEvent
 import com.tinnovakovic.hiking.shared.BaseUiState
 import com.tinnovakovic.hiking.shared.BaseViewModel
@@ -14,7 +14,7 @@ interface HomeContract {
     @Immutable
     data class UiState(
         val isStartButton: Boolean,
-        val photos: SnapshotStateList<Photo>,
+        val hikingPhotos: SnapshotStateList<HikingPhoto>,
         val scrollStateToTop: Boolean,
         val isError: Boolean
     ) : BaseUiState {}

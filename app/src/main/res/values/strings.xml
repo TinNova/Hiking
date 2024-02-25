@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Hiking</string>
+
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="no_internet_message">No Internet, please check your internet connection and press start button to try again.</string>
+
+
+
+
 </resources>

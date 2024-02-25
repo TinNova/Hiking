@@ -6,18 +6,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.tinnovakovic.hiking.R
 import com.tinnovakovic.hiking.shared.DestroyLifecycleHandler
 import com.tinnovakovic.hiking.shared.ResumeLifecycleHandler
+import com.tinnovakovic.hiking.spacing
 
 @Composable
 fun HomeScreen() {
@@ -46,7 +49,7 @@ fun HomeScreenContent(
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(MaterialTheme.spacing.medium)
     ) {
 
         OutlinedButton(
@@ -58,13 +61,13 @@ fun HomeScreenContent(
                 }
             }
         ) {
-            Text(if (uiState.isStartButton) "Start" else "Stop")
+            Text(if (uiState.isStartButton) stringResource(R.string.start) else stringResource(R.string.stop))
         }
 
         if (uiState.isError) {
             Text(
-                modifier = Modifier.padding(vertical = 16.dp),
-                text = "No Internet, please check your internet connection and press start button to try again."
+                modifier = Modifier.padding(vertical = MaterialTheme.spacing.medium),
+                text = stringResource(R.string.no_internet_message)
             )
         }
         val scrollState = rememberLazyListState()
@@ -74,26 +77,25 @@ fun HomeScreenContent(
             reverseLayout = true,
             state = scrollState
         ) {
-            items(uiState.photos.size) { index ->
-                val photo = uiState.photos[index]
+            items(uiState.hikingPhotos.size) { index ->
+                val hikingPhoto = uiState.hikingPhotos[index]
                 AsyncImage(
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    model = "$FLICKR_IMAGE_HOST${photo.server}/${photo.id}_${photo.secret}_b.jpg",
+                    modifier = Modifier.padding(vertical = MaterialTheme.spacing.small),
+                    model = hikingPhoto.photo,
                     contentDescription = ""
                 )
             }
         }
 
         if (uiState.scrollStateToTop) {
-            LaunchedEffect(uiState.photos) {
-                scrollState.animateScrollToItem(uiState.photos.size + 1, scrollOffset = SCROLL_OFFSET)
+            LaunchedEffect(uiState.hikingPhotos) {
+                scrollState.animateScrollToItem(uiState.hikingPhotos.size + 1, scrollOffset = SCROLL_OFFSET)
             }
         }
 
     }
 }
 
-const val FLICKR_IMAGE_HOST = "https://live.staticflickr.com/"
 const val SCROLL_OFFSET = -100
 
 
@@ -110,15 +112,18 @@ const val SCROLL_OFFSET = -100
 // --Link: https://support.google.com/googleplay/android-developer/answer/9799150#Accessing%20location%20in%20the%20foreground
 
 //TODO:
-// -- To ensure we're updating the list, download more photos and check that they don't exist in the list already, right now we download one, but if it's not distinct then we have missed displaying one.
-// -- Handle no internet case and Exceptions -> High Priority
-// -- There is still a crash when null is returned somehow. Try navigating in unpopulated area -> High Priority
+// -- GetPhotoFromLocationUseCase Can't be tested because of global var
+// -- Improve the scroll to top logic when onResume is called
 
 // -- LOW PRIORITY ITEMS
 // -- Check if the images are recomposing? If they are give each item a key? -> Low Priority
 // -- Filter API for only outdoor and nature photos? To Avoid photos of food of example -> Not specified in requirements
 
 // -- DONE ITEMS
+// -- Create an extension function to create the Coil image URL - DONE
+// -- Move hardcoded strings and padding values to String Res file - DONE
+// -- Handle no internet case - DONE
+// -- To ensure we're updating the list, download more photos and check that they don't exist in the list already, right now we download one, but if it's not distinct then we have missed displaying one. - DONE
 // -- scroll to latest photo on onResume -> High Priority - DONE
 // -- Ensure we don't display the same image twice - DONE
 // -- Ask user for notification permissions - DONE
@@ -126,4 +131,6 @@ const val SCROLL_OFFSET = -100
 // The Crash:
 //java.lang.NullPointerException: Parameter specified as non-null is null: method kotlin.collections.CollectionsKt___CollectionsKt.firstOrNull, parameter <this>
 //at kotlin.collections.CollectionsKt___CollectionsKt.firstOrNull(Unknown Source:2)
-//at com.tinnovakovic.hiking.domain.GetPhotoFromLocationUseCase.execute(getPhotoFromLocationUseCase.kt:14)
+//at com.tinnovakovic.hiking.domain.GetPhotoFromLocationUseCase.execute(GetPhotoFromLocationUseCase.kt:14)
+
+// -> Can't reproduce the error, I tried navigating down a country road where no images exist.

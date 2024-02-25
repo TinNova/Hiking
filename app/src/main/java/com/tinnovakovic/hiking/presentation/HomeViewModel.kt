@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
 import com.tinnovakovic.hiking.data.LocationInMemoryCache
-import com.tinnovakovic.hiking.data.Photo
 import com.tinnovakovic.hiking.domain.GetPhotoFromLocationUseCase
+import com.tinnovakovic.hiking.domain.HikingPhoto
 import com.tinnovakovic.hiking.domain.StartLocationServiceUseCase
 import com.tinnovakovic.hiking.domain.StopLocationServiceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,10 +27,7 @@ class HomeViewModel @Inject constructor(
         MutableStateFlow(initialUiState())
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        Log.d("Network Error", "${throwable.message}")
-
-        //TODO: If it's an internet connection, ask user to try again.
-        // -- If it's another error then tell user there is another error, try again.
+        Log.d("Network Error", "message: ${throwable.message}")
         stopLocationServiceUseCase.execute()
         updateUiState {
             it.copy(isError = true, isStartButton = true)
@@ -50,11 +47,11 @@ class HomeViewModel @Inject constructor(
                     locationInMemoryCache.cache.collect { latestLocation ->
 
                         latestLocation?.let { location ->
-                            val latestDistinctPhotos: Set<Photo> =
+                            val latestDistinctPhotos: Set<HikingPhoto> =
                                 photoFromLocationUseCase.execute(location)
                             updateUiState {
                                 it.copy(
-                                    photos = latestDistinctPhotos.toMutableStateList(),
+                                    hikingPhotos = latestDistinctPhotos.toMutableStateList(),
                                     scrollStateToTop = false
                                 )
                             }
@@ -83,7 +80,7 @@ class HomeViewModel @Inject constructor(
     private companion object {
         fun initialUiState() = HomeContract.UiState(
             isStartButton = true,
-            photos = mutableStateListOf(),
+            hikingPhotos = mutableStateListOf(),
             scrollStateToTop = false,
             isError = false
         )
