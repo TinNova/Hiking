@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -17,6 +19,10 @@ android {
     namespace = "com.tinnovakovic.hiking"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.tinnovakovic.hiking"
         minSdk = 30
@@ -25,6 +31,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+
+        buildConfigField("String", "FLICKR_API_KEY", "\"${properties.getProperty("FLICKR_API_KEY")}\"")
+        buildConfigField("String", "FLICKR_SECRET", "\"${properties.getProperty("FLICKR_SECRET")}\"")
     }
 
     buildTypes {

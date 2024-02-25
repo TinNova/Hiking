@@ -16,4 +16,9 @@ class StartLocationServiceUseCase @Inject constructor(private val contextProvide
         }
     }
 
+    //TODO
+    // -- This about injecting the LocationInMemoryCache here and returning a flow
+    // -- of location, as right now that logic is handled in the ViewModel but doesn't
+    // -- have to be.
+
 }
