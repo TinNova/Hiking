@@ -19,10 +19,19 @@ fun DestroyLifecycleHandler(eventHandler: (Lifecycle.Event) -> Unit) {
 }
 
 @Composable
+fun ResumeLifecycleHandler(eventHandler: (Lifecycle.Event) -> Unit) {
+    LifecycleEventListener {
+        if (it == Lifecycle.Event.ON_RESUME) {
+            eventHandler(it)
+        }
+    }
+}
+
+@Composable
 fun LifecycleEventListener(eventHandler: (Lifecycle.Event) -> Unit) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(key1 = lifecycle) {
-        // Make MapView follow the current lifecycle
+
         val lifecycleObserver = LifecycleEventObserver { _, event ->
             eventHandler(event)
         }
