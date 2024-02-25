@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.tinnovakovic.hiking.R
 import com.tinnovakovic.hiking.shared.DestroyLifecycleHandler
+import com.tinnovakovic.hiking.shared.PauseLifecycleHandler
 import com.tinnovakovic.hiking.shared.ResumeLifecycleHandler
 import com.tinnovakovic.hiking.spacing
 
@@ -38,6 +39,10 @@ fun HomeScreen() {
 
     ResumeLifecycleHandler {
         viewModel.onUiEvent(HomeContract.UiEvents.OnResume)
+    }
+
+    PauseLifecycleHandler {
+        viewModel.onUiEvent(HomeContract.UiEvents.OnPause)
     }
 }
 
@@ -112,14 +117,15 @@ const val SCROLL_OFFSET = -100
 // --Link: https://support.google.com/googleplay/android-developer/answer/9799150#Accessing%20location%20in%20the%20foreground
 
 //TODO:
-// -- GetPhotoFromLocationUseCase Can't be tested because of global var
-// -- Improve the scroll to top logic when onResume is called
+
 
 // -- LOW PRIORITY ITEMS
 // -- Check if the images are recomposing? If they are give each item a key? -> Low Priority
 // -- Filter API for only outdoor and nature photos? To Avoid photos of food of example -> Not specified in requirements
 
 // -- DONE ITEMS
+// -- GetPhotoFromLocationUseCase Can't be tested because of global var
+// -- Improve the scroll to top logic when onResume is called
 // -- Create an extension function to create the Coil image URL - DONE
 // -- Move hardcoded strings and padding values to String Res file - DONE
 // -- Handle no internet case - DONE

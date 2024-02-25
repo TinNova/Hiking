@@ -40,19 +40,19 @@ class HomeViewModel @Inject constructor(
                 startLocationServiceUseCase.execute()
 
                 updateUiState {
-                    it.copy(isStartButton = false, scrollStateToTop = false, isError = false)
+                    it.copy(isStartButton = false, isError = false)
                 }
 
                 viewModelScope.launch(exceptionHandler) {
+
+                    var latestDistinctPhotos: Set<HikingPhoto> = setOf()
                     locationInMemoryCache.cache.collect { latestLocation ->
 
                         latestLocation?.let { location ->
-                            val latestDistinctPhotos: Set<HikingPhoto> =
-                                photoFromLocationUseCase.execute(location)
+                            latestDistinctPhotos = photoFromLocationUseCase.execute(latestDistinctPhotos, location)
                             updateUiState {
                                 it.copy(
-                                    hikingPhotos = latestDistinctPhotos.toMutableStateList(),
-                                    scrollStateToTop = false
+                                    hikingPhotos = latestDistinctPhotos.toMutableStateList()
                                 )
                             }
 
@@ -66,13 +66,16 @@ class HomeViewModel @Inject constructor(
             is HomeContract.UiEvents.StopClicked -> {
                 stopLocationServiceUseCase.execute()
                 updateUiState {
-                    it.copy(isStartButton = true, scrollStateToTop = false)
+                    it.copy(isStartButton = true)
                 }
             }
 
             is HomeContract.UiEvents.OnDestroy -> stopLocationServiceUseCase.execute()
             is HomeContract.UiEvents.OnResume -> {
                 updateUiState { it.copy(scrollStateToTop = true) }
+            }
+            is HomeContract.UiEvents.OnPause -> {
+                updateUiState { it.copy(scrollStateToTop = false) }
             }
         }
     }

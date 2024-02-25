@@ -28,6 +28,15 @@ fun ResumeLifecycleHandler(eventHandler: (Lifecycle.Event) -> Unit) {
 }
 
 @Composable
+fun PauseLifecycleHandler(eventHandler: (Lifecycle.Event) -> Unit) {
+    LifecycleEventListener {
+        if (it == Lifecycle.Event.ON_PAUSE) {
+            eventHandler(it)
+        }
+    }
+}
+
+@Composable
 fun LifecycleEventListener(eventHandler: (Lifecycle.Event) -> Unit) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(key1 = lifecycle) {

@@ -1,6 +1,7 @@
 package com.tinnovakovic.hiking.data
 
 import android.location.Location
+import com.tinnovakovic.hiking.shared.InMemoryCache
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject

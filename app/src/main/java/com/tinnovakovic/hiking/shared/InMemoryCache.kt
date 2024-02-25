@@ -1,4 +1,4 @@
-package com.tinnovakovic.hiking.data
+package com.tinnovakovic.hiking.shared
 
 import kotlinx.coroutines.flow.StateFlow
 

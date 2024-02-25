@@ -2,7 +2,6 @@ package com.tinnovakovic.hiking.domain
 
 import android.location.Location
 import com.tinnovakovic.hiking.data.FlickrRepo
-import com.tinnovakovic.hiking.data.Photo
 import javax.inject.Inject
 
 class GetPhotoFromLocationUseCase @Inject constructor(
@@ -10,30 +9,33 @@ class GetPhotoFromLocationUseCase @Inject constructor(
     private val mapFlickrPhotoToHikingPhotosUseCase: MapFlickrPhotoToHikingPhotosUseCase
 ) {
 
-    private val photosSet = mutableSetOf<HikingPhoto>()
-
-    suspend fun execute(location: Location): Set<HikingPhoto> {
+    suspend fun execute(
+        existingHikingPhotos: Set<HikingPhoto>,
+        location: Location
+    ): Set<HikingPhoto> {
         val flickrPhoto = flickrRepo.getFlickrPhoto(location)
         val hikingPhotos = mapFlickrPhotoToHikingPhotosUseCase.execute(flickrPhoto)
 
-        addFirstDistinctPhotoToSetOrNone(hikingPhotos)
-
-        return photosSet
+        return addFirstDistinctPhotoToSetOrNone(existingHikingPhotos.toMutableSet(), hikingPhotos)
     }
 
-    private fun addFirstDistinctPhotoToSetOrNone(hikingPhotos: List<HikingPhoto>) {
-        if (hikingPhotos.isNotEmpty()) {
+    private fun addFirstDistinctPhotoToSetOrNone(
+        existingHikingPhotos: MutableSet<HikingPhoto>,
+        latestHikingPhotos: List<HikingPhoto>
+    ): MutableSet<HikingPhoto> {
+        return if (latestHikingPhotos.isNotEmpty()) {
 
             var wasAdded = false
-            hikingPhotos.forEach {
+            latestHikingPhotos.forEach {
                 if (!wasAdded) {
-                    wasAdded = photosSet.add(it)
+                    wasAdded = existingHikingPhotos.add(it)
                 } else {
-                    return
+                    return@forEach
                 }
             }
+            existingHikingPhotos
+        } else {
+            existingHikingPhotos
         }
     }
 }
-
-
