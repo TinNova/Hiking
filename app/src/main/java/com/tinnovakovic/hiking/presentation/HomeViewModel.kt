@@ -62,6 +62,10 @@ class HomeViewModel @Inject constructor(
             is HomeContract.UiEvents.OnPause -> {
                 updateUiState { it.copy(scrollStateToTop = false) }
             }
+
+            HomeContract.UiEvents.PostScrollToTop -> {
+                updateUiState { it.copy(scrollStateToTop = false) }
+            }
         }
     }
 

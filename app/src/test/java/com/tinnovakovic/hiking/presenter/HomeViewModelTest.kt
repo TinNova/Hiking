@@ -95,6 +95,24 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `WHEN PostScrollToTop, THEN update uiState to scrollStateToTop=false`() = runTest {
+        //GIVEN
+        createSut()
+        //WHEN
+        sut.onUiEvent(HomeContract.UiEvents.PostScrollToTop)
+
+        //THEN
+        assertAll(
+            { assertFalse(sut.uiState.value.scrollStateToTop) },
+
+            //The same as initial values
+            { assertTrue(sut.uiState.value.isStartButton) },
+            { assertFalse(sut.uiState.value.isError) },
+            { assertEquals(0, sut.uiState.value.hikingPhotos.size) }
+        )
+    }
+
+    @Test
     fun `WHEN OnDestroy, THEN verify stopLocationServiceUseCase triggered`() = runTest {
         //GIVEN
         createSut()

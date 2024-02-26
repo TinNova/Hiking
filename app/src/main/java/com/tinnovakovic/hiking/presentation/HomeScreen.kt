@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -59,6 +60,7 @@ fun HomeScreenContent(
     if (uiState.scrollStateToTop) {
         LaunchedEffect(uiState.hikingPhotos) {
             scrollState.scrollToItem(uiState.hikingPhotos.size + 1)
+            uiAction.invoke(HomeContract.UiEvents.PostScrollToTop)
         }
     }
 

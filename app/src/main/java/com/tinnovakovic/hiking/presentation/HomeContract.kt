@@ -25,5 +25,6 @@ interface HomeContract {
         data object OnDestroy : UiEvents()
         data object OnResume : UiEvents()
         data object OnPause : UiEvents()
+        data object PostScrollToTop : UiEvents()
     }
 }
