@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
 import com.tinnovakovic.hiking.data.LocationInMemoryCache
+import com.tinnovakovic.hiking.data.PhotoInMemoryCache
 import com.tinnovakovic.hiking.domain.GetPhotoFromLocationUseCase
 import com.tinnovakovic.hiking.domain.HikingPhoto
 import com.tinnovakovic.hiking.domain.StartLocationServiceUseCase
@@ -20,18 +21,19 @@ class HomeViewModel @Inject constructor(
     private val startLocationServiceUseCase: StartLocationServiceUseCase,
     private val stopLocationServiceUseCase: StopLocationServiceUseCase,
     private val photoFromLocationUseCase: GetPhotoFromLocationUseCase,
-    private val locationInMemoryCache: LocationInMemoryCache
+    private val locationInMemoryCache: LocationInMemoryCache,
+    private val photoInMemoryCache: PhotoInMemoryCache
 ) : HomeContract.ViewModel() {
 
     override val _uiState: MutableStateFlow<HomeContract.UiState> =
         MutableStateFlow(initialUiState())
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        Log.d("Network Error", "message: ${throwable.message}")
-        stopLocationServiceUseCase.execute()
         updateUiState {
-            it.copy(isError = true, isStartButton = true)
+            it.copy(isError = true)
         }
+        // keep trying until user stops it or app terminates.
+        observeLocationAndFetchPhotos()
     }
 
     override fun onUiEvent(event: HomeContract.UiEvents) {
@@ -66,19 +68,19 @@ class HomeViewModel @Inject constructor(
 
     private fun observeLocationAndFetchPhotos() {
         viewModelScope.launch(exceptionHandler) {
-            var latestDistinctPhotos: Set<HikingPhoto> = setOf()
             locationInMemoryCache.cache.collect { latestLocation ->
 
                 latestLocation?.let { location ->
-                    latestDistinctPhotos =
-                        photoFromLocationUseCase.execute(latestDistinctPhotos, location)
+                    val latestDistinctPhotos: Set<HikingPhoto> = photoInMemoryCache.cache.value
+                    val photos = photoFromLocationUseCase.execute(latestDistinctPhotos, location)
+                    photoInMemoryCache.updateCache(photos)
+
                     updateUiState {
                         it.copy(
-                            hikingPhotos = latestDistinctPhotos.toMutableStateList()
+                            hikingPhotos = photos.toMutableStateList(),
+                            isError = false
                         )
                     }
-
-                    Log.d("TINTIN", "ViewModel LocationInMemoryCache: $location")
                 }
             }
         }
