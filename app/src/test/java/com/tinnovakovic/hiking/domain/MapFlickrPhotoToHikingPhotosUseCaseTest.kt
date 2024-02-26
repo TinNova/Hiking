@@ -1,11 +1,11 @@
 package com.tinnovakovic.hiking.domain
 
-import com.tinnovakovic.hiking.data.FlickrPhotos
-import com.tinnovakovic.hiking.data.FlickrRepo
-import com.tinnovakovic.hiking.data.Photo
-import com.tinnovakovic.hiking.data.Photos
-import io.mockk.mockk
-import org.junit.Test
+import com.tinnovakovic.hiking.data.photo.FlickrPhotos
+import com.tinnovakovic.hiking.data.photo.Photo
+import com.tinnovakovic.hiking.data.photo.Photos
+import com.tinnovakovic.hiking.domain.photo.HikingPhoto
+import com.tinnovakovic.hiking.domain.photo.MapFlickrPhotoToHikingPhotosUseCase
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 
 class MapFlickrPhotoToHikingPhotosUseCaseTest {

@@ -4,7 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import com.tinnovakovic.hiking.data.LocationService.Companion.NOTIFICATION_CHANNEL_ID
+import com.tinnovakovic.hiking.data.location.LocationService.Companion.NOTIFICATION_CHANNEL_ID
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp

@@ -1,4 +1,4 @@
-package com.tinnovakovic.hiking.data
+package com.tinnovakovic.hiking.data.location
 
 import android.app.NotificationManager
 import android.app.Service

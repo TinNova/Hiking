@@ -23,7 +23,7 @@ import com.tinnovakovic.hiking.R
 import com.tinnovakovic.hiking.shared.DestroyLifecycleHandler
 import com.tinnovakovic.hiking.shared.PauseLifecycleHandler
 import com.tinnovakovic.hiking.shared.ResumeLifecycleHandler
-import com.tinnovakovic.hiking.spacing
+import com.tinnovakovic.hiking.shared.spacing
 
 
 @Composable
@@ -54,6 +54,14 @@ fun HomeScreenContent(
     uiState: HomeContract.UiState,
     uiAction: (HomeContract.UiEvents) -> Unit,
 ) {
+    val scrollState = rememberLazyListState()
+
+    if (uiState.scrollStateToTop) {
+        LaunchedEffect(uiState.hikingPhotos) {
+            scrollState.scrollToItem(uiState.hikingPhotos.size + 1)
+        }
+    }
+
     Column(
         Modifier
             .fillMaxWidth()
@@ -84,7 +92,6 @@ fun HomeScreenContent(
                 text = stringResource(R.string.no_internet_message)
             )
         }
-        val scrollState = rememberLazyListState()
 
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
@@ -101,20 +108,8 @@ fun HomeScreenContent(
             }
         }
 
-        if (uiState.scrollStateToTop) {
-            LaunchedEffect(uiState.hikingPhotos) {
-                scrollState.animateScrollToItem(
-                    uiState.hikingPhotos.size + 1,
-                    scrollOffset = SCROLL_OFFSET
-                )
-            }
-        }
+
     }
 }
 
 const val SCROLL_OFFSET = -100
-
-
-// TODO
-// -- Unit Tests
-// -- The scroll function doesn't work first time, likely because it doesn't have the correct list size?

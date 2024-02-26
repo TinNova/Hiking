@@ -1,4 +1,4 @@
-package com.tinnovakovic.hiking
+package com.tinnovakovic.hiking.shared
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.unit.Dp

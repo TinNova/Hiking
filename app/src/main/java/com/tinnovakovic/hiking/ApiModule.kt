@@ -1,7 +1,7 @@
 package com.tinnovakovic.hiking
 
 import com.google.gson.Gson
-import com.tinnovakovic.hiking.data.FlickrApi
+import com.tinnovakovic.hiking.data.photo.FlickrApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

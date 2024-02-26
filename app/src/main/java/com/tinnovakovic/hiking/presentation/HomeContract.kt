@@ -1,10 +1,10 @@
 package com.tinnovakovic.hiking.presentation
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.tinnovakovic.hiking.domain.HikingPhoto
-import com.tinnovakovic.hiking.shared.BaseUiEvent
-import com.tinnovakovic.hiking.shared.BaseUiState
-import com.tinnovakovic.hiking.shared.BaseViewModel
+import com.tinnovakovic.hiking.domain.photo.HikingPhoto
+import com.tinnovakovic.hiking.shared.mvi.BaseUiEvent
+import com.tinnovakovic.hiking.shared.mvi.BaseUiState
+import com.tinnovakovic.hiking.shared.mvi.BaseViewModel
 import javax.annotation.concurrent.Immutable
 
 interface HomeContract {

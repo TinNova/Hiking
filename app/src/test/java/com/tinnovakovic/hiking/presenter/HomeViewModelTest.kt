@@ -3,12 +3,12 @@ package com.tinnovakovic.hiking.presenter
 
 import android.location.Location
 import app.cash.turbine.test
-import com.tinnovakovic.hiking.data.LocationInMemoryCache
-import com.tinnovakovic.hiking.data.PhotoInMemoryCache
-import com.tinnovakovic.hiking.domain.GetPhotoFromLocationUseCase
-import com.tinnovakovic.hiking.domain.HikingPhoto
-import com.tinnovakovic.hiking.domain.StartLocationServiceUseCase
-import com.tinnovakovic.hiking.domain.StopLocationServiceUseCase
+import com.tinnovakovic.hiking.data.location.LocationInMemoryCache
+import com.tinnovakovic.hiking.data.photo.PhotoInMemoryCache
+import com.tinnovakovic.hiking.domain.photo.GetPhotoFromLocationUseCase
+import com.tinnovakovic.hiking.domain.photo.HikingPhoto
+import com.tinnovakovic.hiking.domain.location.StartLocationServiceUseCase
+import com.tinnovakovic.hiking.domain.location.StopLocationServiceUseCase
 import com.tinnovakovic.hiking.presentation.HomeContract
 import com.tinnovakovic.hiking.presentation.HomeViewModel
 import com.tinnovakovic.hiking.shared.CoroutineTestExtension

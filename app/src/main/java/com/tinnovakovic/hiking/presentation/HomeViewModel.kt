@@ -1,15 +1,14 @@
 package com.tinnovakovic.hiking.presentation
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
-import com.tinnovakovic.hiking.data.LocationInMemoryCache
-import com.tinnovakovic.hiking.data.PhotoInMemoryCache
-import com.tinnovakovic.hiking.domain.GetPhotoFromLocationUseCase
-import com.tinnovakovic.hiking.domain.HikingPhoto
-import com.tinnovakovic.hiking.domain.StartLocationServiceUseCase
-import com.tinnovakovic.hiking.domain.StopLocationServiceUseCase
+import com.tinnovakovic.hiking.data.location.LocationInMemoryCache
+import com.tinnovakovic.hiking.data.photo.PhotoInMemoryCache
+import com.tinnovakovic.hiking.domain.photo.GetPhotoFromLocationUseCase
+import com.tinnovakovic.hiking.domain.photo.HikingPhoto
+import com.tinnovakovic.hiking.domain.location.StartLocationServiceUseCase
+import com.tinnovakovic.hiking.domain.location.StopLocationServiceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow

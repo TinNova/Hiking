@@ -1,7 +1,7 @@
-package com.tinnovakovic.hiking.domain
+package com.tinnovakovic.hiking.domain.location
 
 import android.content.Intent
-import com.tinnovakovic.hiking.data.LocationService
+import com.tinnovakovic.hiking.data.location.LocationService
 import com.tinnovakovic.hiking.shared.ContextProvider
 import javax.inject.Inject
 

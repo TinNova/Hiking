@@ -1,4 +1,4 @@
-package com.tinnovakovic.hiking.data
+package com.tinnovakovic.hiking.data.photo
 
 import android.location.Location
 import javax.inject.Inject

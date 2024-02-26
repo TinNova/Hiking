@@ -1,4 +1,4 @@
-package com.tinnovakovic.hiking.data
+package com.tinnovakovic.hiking.data.photo
 
 import com.tinnovakovic.hiking.BuildConfig
 import retrofit2.http.GET

@@ -1,7 +1,7 @@
-package com.tinnovakovic.hiking.domain
+package com.tinnovakovic.hiking.domain.photo
 
 import android.location.Location
-import com.tinnovakovic.hiking.data.FlickrRepo
+import com.tinnovakovic.hiking.data.photo.FlickrRepo
 import javax.inject.Inject
 
 class GetPhotoFromLocationUseCase @Inject constructor(

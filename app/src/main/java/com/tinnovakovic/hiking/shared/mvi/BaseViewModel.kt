@@ -1,4 +1,4 @@
-package com.tinnovakovic.hiking.shared
+package com.tinnovakovic.hiking.shared.mvi
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

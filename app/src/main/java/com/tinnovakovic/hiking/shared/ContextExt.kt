@@ -1,4 +1,4 @@
-package com.tinnovakovic.hiking
+package com.tinnovakovic.hiking.shared
 
 import android.Manifest
 import android.content.Context

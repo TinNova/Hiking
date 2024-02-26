@@ -1,14 +1,17 @@
 package com.tinnovakovic.hiking.domain
 
 import android.location.Location
-import com.tinnovakovic.hiking.data.FlickrPhotos
-import com.tinnovakovic.hiking.data.FlickrRepo
+import com.tinnovakovic.hiking.data.photo.FlickrPhotos
+import com.tinnovakovic.hiking.data.photo.FlickrRepo
+import com.tinnovakovic.hiking.domain.photo.GetPhotoFromLocationUseCase
+import com.tinnovakovic.hiking.domain.photo.HikingPhoto
+import com.tinnovakovic.hiking.domain.photo.MapFlickrPhotoToHikingPhotosUseCase
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 
 class GetPhotoFromLocationUseCaseTest {

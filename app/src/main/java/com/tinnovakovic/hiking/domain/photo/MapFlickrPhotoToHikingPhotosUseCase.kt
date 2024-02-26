@@ -1,6 +1,6 @@
-package com.tinnovakovic.hiking.domain
+package com.tinnovakovic.hiking.domain.photo
 
-import com.tinnovakovic.hiking.data.FlickrPhotos
+import com.tinnovakovic.hiking.data.photo.FlickrPhotos
 import javax.inject.Inject
 
 class MapFlickrPhotoToHikingPhotosUseCase @Inject constructor() {
