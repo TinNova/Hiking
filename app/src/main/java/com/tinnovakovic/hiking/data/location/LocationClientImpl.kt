@@ -79,6 +79,6 @@ class LocationClientImpl @Inject constructor(
     }
 
     companion object {
-        const val SECONDS_BETWEEN_UPDATES = 1L // one seconds
+        const val SECONDS_BETWEEN_UPDATES = 5L // twenty seconds
     }
 }

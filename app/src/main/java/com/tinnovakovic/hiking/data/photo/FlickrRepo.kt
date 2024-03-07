@@ -7,7 +7,7 @@ class FlickrRepo @Inject constructor(
     private val flickrApi: FlickrApi
 ) {
 
-    suspend fun fetchFlickrPhoto(location: Location): FlickrPhotos? {
+    suspend fun fetchFlickrPhoto(location: Location): FlickrPhotos {
         return flickrApi.getFlickrPhotosSearch(
             location.latitude.toString(),
             location.longitude.toString()

@@ -20,6 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.tinnovakovic.hiking.R
+import com.tinnovakovic.hiking.presentation.HomeContract.UiEvents
 import com.tinnovakovic.hiking.shared.DestroyLifecycleHandler
 import com.tinnovakovic.hiking.shared.PauseLifecycleHandler
 import com.tinnovakovic.hiking.shared.ResumeLifecycleHandler
@@ -37,29 +38,34 @@ fun HomeScreen() {
     )
 
     DestroyLifecycleHandler {
-        viewModel.onUiEvent(HomeContract.UiEvents.OnDestroy)
+        viewModel.onUiEvent(UiEvents.OnDestroy)
     }
 
     ResumeLifecycleHandler {
-        viewModel.onUiEvent(HomeContract.UiEvents.OnResume)
+        viewModel.onUiEvent(UiEvents.OnResume)
     }
 
     PauseLifecycleHandler {
-        viewModel.onUiEvent(HomeContract.UiEvents.OnPause)
+        viewModel.onUiEvent(UiEvents.OnPause)
     }
 }
 
 @Composable
 fun HomeScreenContent(
     uiState: HomeContract.UiState,
-    uiAction: (HomeContract.UiEvents) -> Unit,
+    uiAction: (UiEvents) -> Unit,
 ) {
     val scrollState = rememberLazyListState()
+
+    LaunchedEffect(true) {
+        // This instead on using init{} in viewModel to prevent race condition
+        uiAction(UiEvents.Initialise)
+    }
 
     if (uiState.scrollStateToTop) {
         LaunchedEffect(uiState.hikingPhotos) {
             scrollState.scrollToItem(uiState.hikingPhotos.size + 1)
-            uiAction.invoke(HomeContract.UiEvents.PostScrollToTop)
+            uiAction.invoke(UiEvents.PostScrollToTop)
         }
     }
 
@@ -77,9 +83,9 @@ fun HomeScreenContent(
             OutlinedButton(
                 onClick = {
                     if (uiState.isStartButton) {
-                        uiAction.invoke(HomeContract.UiEvents.StartClicked)
+                        uiAction.invoke(UiEvents.StartClicked)
                     } else {
-                        uiAction.invoke(HomeContract.UiEvents.StopClicked)
+                        uiAction.invoke(UiEvents.StopClicked)
                     }
                 }
             ) {

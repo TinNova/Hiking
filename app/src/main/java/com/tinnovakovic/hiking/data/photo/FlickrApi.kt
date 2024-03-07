@@ -6,11 +6,11 @@ import retrofit2.http.Query
 
 interface FlickrApi {
 
-    @GET("?method=flickr.photos.search&api_key=${BuildConfig.FLICKR_API_KEY}&radius=0.1&format=json&per_page=1&nojsoncallback=1")
+    @GET("?method=flickr.photos.search&api_key=${BuildConfig.FLICKR_API_KEY}&radius=0.1&format=json&per_page=10&nojsoncallback=1")
     suspend fun getFlickrPhotosSearch(
         @Query("lat") lat: String,
         @Query("lon") lon: String
-    ): FlickrPhotos?
+    ): FlickrPhotos
 
 }
 

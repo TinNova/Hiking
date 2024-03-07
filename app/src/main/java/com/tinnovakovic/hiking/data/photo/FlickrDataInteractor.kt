@@ -1,19 +1,23 @@
-package com.tinnovakovic.hiking.domain.photo
+package com.tinnovakovic.hiking.data.photo
 
-import com.tinnovakovic.hiking.data.photo.FlickrPhotos
 import javax.inject.Inject
 
-class MapFlickrPhotoToHikingPhotosUseCase @Inject constructor() {
+class FlickrDataInteractor @Inject constructor() {
 
-    fun execute(flickrPhoto: FlickrPhotos): List<HikingPhoto> {
+    fun mapFlickrPhotoToHikingPhotoEntity(flickrPhoto: FlickrPhotos): List<HikingPhotoEntity> {
         return flickrPhoto.photos.photo.map {
-            HikingPhoto(
+            HikingPhotoEntity(
                 photo =
                 "$FLICKR_IMAGE_HOST${it.server}/${it.id}_${it.secret}_$FLICKR_IMAGE_SIZE$FLICKR_IMAGE_FORMAT"
             )
         }
     }
+
+
 }
+
+fun HikingPhotoEntity.asExternalModel() = HikingPhoto(photo = photo)
+
 
 const val FLICKR_IMAGE_HOST = "https://live.staticflickr.com/"
 const val FLICKR_IMAGE_SIZE = "b"

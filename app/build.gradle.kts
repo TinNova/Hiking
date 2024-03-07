@@ -14,6 +14,8 @@ val jUnitVersion = "5.8.2"
 val mockkVersion = "1.13.9"
 val okHttp = "4.11.0"
 val hiltVersion = "2.50"
+val roomVersion = "2.6.1"
+
 
 android {
     namespace = "com.tinnovakovic.hiking"
@@ -77,6 +79,15 @@ android {
 }
 
 dependencies {
+
+    implementation("androidx.room:room-runtime:$roomVersion")
+    annotationProcessor("androidx.room:room-compiler:$roomVersion")
+
+    // To use Kotlin annotation processing tool (kapt)
+    kapt("androidx.room:room-compiler:$roomVersion")
+
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation("androidx.room:room-ktx:$roomVersion")
 
     implementation("com.google.android.gms:play-services-location:21.1.0")
 

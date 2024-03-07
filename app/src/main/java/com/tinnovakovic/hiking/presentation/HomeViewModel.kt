@@ -1,12 +1,10 @@
 package com.tinnovakovic.hiking.presentation
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.toMutableStateList
+import androidx.annotation.MainThread
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.tinnovakovic.hiking.data.location.LocationInMemoryCache
-import com.tinnovakovic.hiking.data.photo.PhotoInMemoryCache
-import com.tinnovakovic.hiking.domain.photo.GetPhotoFromLocationUseCase
-import com.tinnovakovic.hiking.domain.photo.HikingPhoto
+import com.tinnovakovic.hiking.data.photo.HikingPhotoRepository
 import com.tinnovakovic.hiking.domain.location.StartLocationServiceUseCase
 import com.tinnovakovic.hiking.domain.location.StopLocationServiceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,13 +17,15 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val startLocationServiceUseCase: StartLocationServiceUseCase,
     private val stopLocationServiceUseCase: StopLocationServiceUseCase,
-    private val photoFromLocationUseCase: GetPhotoFromLocationUseCase,
     private val locationInMemoryCache: LocationInMemoryCache,
-    private val photoInMemoryCache: PhotoInMemoryCache
+    private val hikingPhotoRepository: HikingPhotoRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : HomeContract.ViewModel() {
 
     override val _uiState: MutableStateFlow<HomeContract.UiState> =
         MutableStateFlow(initialUiState())
+
+    private var initializeCalled = false
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         updateUiState {
@@ -33,10 +33,32 @@ class HomeViewModel @Inject constructor(
         }
         // keep trying until user stops it or app terminates.
         observeLocationAndFetchPhotos()
+        observeHikingPhotos()
     }
+
+    @MainThread
+    private fun initialise() {
+        if (initializeCalled) return
+        initializeCalled = true
+
+//        restoreSavedState()
+//        Log.d("TINTINTEST", "initialise")
+
+    }
+
+//    private fun restoreSavedState() {
+//        viewModelScope.launch {
+////            savedStateHandle.get<Set<HikingPhoto>>(SAVED_STATE_IMAGES)?.let {
+////                Log.d("TINTINTEST", "restored Images, first image: ${it.first()}")
+////                displayPhotos(it)
+////            }
+//        }
+//    }
 
     override fun onUiEvent(event: HomeContract.UiEvents) {
         when (event) {
+            is HomeContract.UiEvents.Initialise -> initialise()
+
             is HomeContract.UiEvents.StartClicked -> {
                 startLocationServiceUseCase.execute()
 
@@ -45,6 +67,7 @@ class HomeViewModel @Inject constructor(
                 }
 
                 observeLocationAndFetchPhotos()
+                observeHikingPhotos()
             }
 
             is HomeContract.UiEvents.StopClicked -> {
@@ -74,28 +97,44 @@ class HomeViewModel @Inject constructor(
             locationInMemoryCache.cache.collect { latestLocation ->
 
                 latestLocation?.let { location ->
-                    val latestDistinctPhotos: Set<HikingPhoto> = photoInMemoryCache.cache.value
-                    val photos = photoFromLocationUseCase.execute(latestDistinctPhotos, location)
-                    photoInMemoryCache.updateCache(photos)
-
-                    updateUiState {
-                        it.copy(
-                            hikingPhotos = photos.toMutableStateList(),
-                            isError = false
-                        )
-                    }
+                    // fetch and add photo to database
+                    hikingPhotoRepository.fetchAndInsertPhoto(location)
                 }
             }
         }
     }
 
+    private fun observeHikingPhotos() {
+        viewModelScope.launch {
+            hikingPhotoRepository.getHikingPhotosStream().collect { hikingPhotos ->
+                updateUiState {
+                    it.copy(
+                        hikingPhotos = hikingPhotos,
+                        isError = false
+                    )
+                }
+            }
+        }
+    }
 
     private companion object {
         fun initialUiState() = HomeContract.UiState(
             isStartButton = true,
-            hikingPhotos = mutableStateListOf(),
+            hikingPhotos = listOf(),
             scrollStateToTop = false,
             isError = false
         )
+
+        const val SAVED_STATE_IMAGES = "saved_state_image"
     }
 }
+
+//TODO:
+// - Observe internet state and check it inside observeLocationAndFetchPhotos()
+// - Save photos in Room
+// - Have a savedStateHandle save a boolean
+//   -- After process death recovery it should be true, then display the images and start location tracking again
+// - Should database return a list of HikingPhotoEntity or HikingPhoto? Check offline app documentation
+// - Check if compose is recomposing a lot, considering using a key with the LazyColumn
+// - Add button to reset photos/hike
+// - Add Error handling, check all error FlickrApi can send
