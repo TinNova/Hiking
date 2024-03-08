@@ -8,9 +8,11 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.tinnovakovic.hiking.R
-import com.tinnovakovic.hiking.shared.ApplicationCoroutineScope
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -25,10 +27,8 @@ class LocationService : Service() {
     @Inject
     lateinit var locationMemoryCache: LocationInMemoryCache
 
-    @Inject
-    lateinit var applicationCoroutineScope: ApplicationCoroutineScope
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    private var locationJob: Job = Job()
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -51,7 +51,7 @@ class LocationService : Service() {
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        locationJob = locationClient
+        locationClient
             .getLocationUpdates()
             .catch { e -> e.printStackTrace() }
             .onEach { location ->
@@ -62,7 +62,7 @@ class LocationService : Service() {
                 notificationManager.notify(LOCATION_NOTIFICATION_ID, updatedNotification.build())
                 locationMemoryCache.updateCache(location)
             }
-            .launchIn(applicationCoroutineScope.coroutineScope)
+            .launchIn(serviceScope)
 
 
         startForeground(LOCATION_NOTIFICATION_ID, notification.build())
@@ -76,7 +76,7 @@ class LocationService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        locationJob.cancel()
+        serviceScope.cancel()
     }
 
     companion object {
