@@ -48,7 +48,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideNetworkStateProvider(
-        applicationCoroutineScope: CoroutineScope,
+        applicationCoroutineScope: ApplicationCoroutineScope,
         connectivityObserver: ConnectivityObserver
     ): NetworkStateProvider =
         NetworkStateProviderImpl(applicationCoroutineScope, connectivityObserver)

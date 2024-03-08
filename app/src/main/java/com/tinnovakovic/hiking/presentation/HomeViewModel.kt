@@ -168,8 +168,8 @@ class HomeViewModel @Inject constructor(
 // - Observe state of notification and location permission
 // - Improve error handling infinite loop
 // - Improve notification messaging
-// - Use our ApplicationScope in the Location tracking
 // - Display dialog when user clicks reset
+// - Display reset button only where there is data to delete
 
 //DONE:
 // - Save photos in Room
@@ -178,3 +178,5 @@ class HomeViewModel @Inject constructor(
 // - Should database return a list of HikingPhotoEntity or HikingPhoto? Check offline app documentation
 // - Observe internet state on initialise
 // - Add button to reset photos/hike
+// - Use our ApplicationScope in the Location tracking
+

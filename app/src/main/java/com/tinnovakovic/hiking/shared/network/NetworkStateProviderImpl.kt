@@ -1,5 +1,6 @@
 package com.tinnovakovic.hiking.shared.network
 
+import com.tinnovakovic.hiking.shared.ApplicationCoroutineScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +12,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 class NetworkStateProviderImpl @Inject constructor(
-    @Singleton val applicationCoroutineScope: CoroutineScope,
+    @Singleton val applicationCoroutineScope: ApplicationCoroutineScope,
     private val connectivityObserver: ConnectivityObserver,
 ) : NetworkStateProvider {
 
@@ -23,7 +24,7 @@ class NetworkStateProviderImpl @Inject constructor(
             .onEach {
                 isOnlineFlow.value = it
             }
-            .launchIn(applicationCoroutineScope)
+            .launchIn(applicationCoroutineScope.coroutineScope)
 
         return isOnlineFlow.asStateFlow()
     }

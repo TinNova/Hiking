@@ -8,18 +8,16 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.tinnovakovic.hiking.R
+import com.tinnovakovic.hiking.shared.ApplicationCoroutineScope
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class LocationService: Service()  {
+class LocationService : Service() {
 
     @Inject
     lateinit var locationClient: LocationClient
@@ -27,19 +25,17 @@ class LocationService: Service()  {
     @Inject
     lateinit var locationMemoryCache: LocationInMemoryCache
 
+    @Inject
+    lateinit var applicationCoroutineScope: ApplicationCoroutineScope
 
-    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-//    private lateinit var locationClient: LocationClient
+    private var locationJob: Job = Job()
+
     override fun onBind(p0: Intent?): IBinder? {
         return null
     }
 
-    override fun onCreate() {
-        super.onCreate()
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        when(intent?.action) {
+        when (intent?.action) {
             ACTION_START -> start()
             ACTION_STOP -> stop()
         }
@@ -55,7 +51,7 @@ class LocationService: Service()  {
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        locationClient
+        locationJob = locationClient
             .getLocationUpdates()
             .catch { e -> e.printStackTrace() }
             .onEach { location ->
@@ -66,7 +62,7 @@ class LocationService: Service()  {
                 notificationManager.notify(LOCATION_NOTIFICATION_ID, updatedNotification.build())
                 locationMemoryCache.updateCache(location)
             }
-            .launchIn(serviceScope)
+            .launchIn(applicationCoroutineScope.coroutineScope)
 
 
         startForeground(LOCATION_NOTIFICATION_ID, notification.build())
@@ -80,7 +76,7 @@ class LocationService: Service()  {
 
     override fun onDestroy() {
         super.onDestroy()
-        serviceScope.cancel()
+        locationJob.cancel()
     }
 
     companion object {
