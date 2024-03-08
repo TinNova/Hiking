@@ -3,8 +3,8 @@
 
     <string name="start">Start</string>
     <string name="stop">Stop</string>
-    <string name="no_internet_message">No Internet, please check your internet connection and press start button to try again.</string>
-
+    <string name="generic_error_message">Oops an unknown error occurred.</string>
+    <string name="offline_message">Offline.</string>
 
 
 

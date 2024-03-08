@@ -93,10 +93,10 @@ fun HomeScreenContent(
             }
         }
 
-        if (uiState.isError) {
+        if (uiState.errorMessage != null) {
             Text(
                 modifier = Modifier.padding(vertical = MaterialTheme.spacing.medium),
-                text = stringResource(R.string.no_internet_message)
+                text = uiState.errorMessage
             )
         }
 
