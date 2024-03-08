@@ -1,4 +1,4 @@
-package com.tinnovakovic.hiking.data.photo
+package com.tinnovakovic.hiking.data.photo.models
 
 data class FlickrPhotos(
     val photos: Photos

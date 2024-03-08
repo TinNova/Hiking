@@ -2,6 +2,7 @@ package com.tinnovakovic.hiking
 
 import com.google.gson.Gson
 import com.tinnovakovic.hiking.data.photo.FlickrApi
+import com.tinnovakovic.hiking.shared.ResultCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,6 +27,7 @@ object ApiModule {
                     .build()
             )
             .addConverterFactory(gsonConverterFactory)
+            .addCallAdapterFactory(ResultCallAdapterFactory())
             .build()
             .create(FlickrApi::class.java)
     }

@@ -161,15 +161,15 @@ class HomeViewModel @Inject constructor(
 }
 
 //TODO:
+// - Add Error handling, check all error FlickrApi can send and exponential backoff, see android offline documentation
 //   - How to handle these states
 //      - Offline but user presses start/stop -> offline message should display and network calls should be blocked to prevent Http IO Exception
-// - Check if compose is recomposing a lot, considering using a key with the LazyColumn
-// - Add Error handling, check all error FlickrApi can send and exponential backoff, see android offline documentation
 // - Observe state of notification and location permission
 // - Improve error handling infinite loop
 // - Improve notification messaging
 // - Display dialog when user clicks reset
 // - Display reset button only where there is data to delete
+// - Check if compose is recomposing a lot, considering using a key with the LazyColumn
 
 //DONE:
 // - Save photos in Room
@@ -179,4 +179,18 @@ class HomeViewModel @Inject constructor(
 // - Observe internet state on initialise
 // - Add button to reset photos/hike
 // - Use our ApplicationScope in the Location tracking
+
+//TODO: Manual Test Instructions
+// - Standard version
+//   - Press start/stop
+//   - Press reset
+//   - Don't keep activity
+//   - Terminate app and reopen
+// - Offline
+//   - Press start/stop
+//   - Press reset
+//   - Don't keep activity
+//   - Terminate app and reopen
+// - API Errors
+//   - Test the standard API errors that are available
 

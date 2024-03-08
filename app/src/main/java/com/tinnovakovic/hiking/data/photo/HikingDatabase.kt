@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.tinnovakovic.hiking.data.photo.models.HikingPhotoEntity
 
 // Annotates class to be a Room Database with a table (entity) of the Word class
 @Database(entities = arrayOf(HikingPhotoEntity::class), version = 1, exportSchema = false)

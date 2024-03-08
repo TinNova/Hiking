@@ -1,5 +1,8 @@
 package com.tinnovakovic.hiking.data.photo
 
+import com.tinnovakovic.hiking.data.photo.models.FlickrPhotos
+import com.tinnovakovic.hiking.data.photo.models.HikingPhoto
+import com.tinnovakovic.hiking.data.photo.models.HikingPhotoEntity
 import javax.inject.Inject
 
 class FlickrDataInteractor @Inject constructor() {

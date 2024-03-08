@@ -1,6 +1,6 @@
 package com.tinnovakovic.hiking.presentation
 
-import com.tinnovakovic.hiking.data.photo.HikingPhoto
+import com.tinnovakovic.hiking.data.photo.models.HikingPhoto
 import com.tinnovakovic.hiking.shared.mvi.BaseUiEvent
 import com.tinnovakovic.hiking.shared.mvi.BaseUiState
 import com.tinnovakovic.hiking.shared.mvi.BaseViewModel

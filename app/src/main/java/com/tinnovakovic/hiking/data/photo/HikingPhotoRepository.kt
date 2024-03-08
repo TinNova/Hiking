@@ -1,6 +1,9 @@
 package com.tinnovakovic.hiking.data.photo
 
 import android.location.Location
+import com.tinnovakovic.hiking.data.photo.models.FlickrPhotos
+import com.tinnovakovic.hiking.data.photo.models.HikingPhoto
+import com.tinnovakovic.hiking.data.photo.models.HikingPhotoEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -20,9 +23,9 @@ class HikingPhotoRepository @Inject constructor(
     }
 
     suspend fun fetchAndInsertPhoto(location: Location) {
-        val flickrPhotos: FlickrPhotos = flickrRepo.fetchFlickrPhoto(location)
+        val flickrPhotos: Result<FlickrPhotos> = flickrRepo.fetchFlickrPhoto(location)
         val hikingPhotoEntities: List<HikingPhotoEntity> =
-            flickrDataInteractor.mapFlickrPhotoToHikingPhotoEntity(flickrPhotos)
+            flickrDataInteractor.mapFlickrPhotoToHikingPhotoEntity(flickrPhotos.getOrThrow())
 
         insertDistinctPhoto(hikingPhotoEntities)
     }
