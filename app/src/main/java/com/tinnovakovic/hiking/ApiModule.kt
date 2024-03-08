@@ -36,7 +36,7 @@ object ApiModule {
     @Singleton
     fun providesOkHttpClient(): OkHttpClient.Builder {
         return OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC))
     }
 
     @Provides

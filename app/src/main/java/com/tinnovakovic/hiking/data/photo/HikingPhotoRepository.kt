@@ -1,6 +1,7 @@
 package com.tinnovakovic.hiking.data.photo
 
 import android.location.Location
+import android.util.Log
 import com.tinnovakovic.hiking.data.photo.models.FlickrPhotos
 import com.tinnovakovic.hiking.data.photo.models.HikingPhoto
 import com.tinnovakovic.hiking.data.photo.models.HikingPhotoEntity
@@ -23,6 +24,7 @@ class HikingPhotoRepository @Inject constructor(
     }
 
     suspend fun fetchAndInsertPhoto(location: Location) {
+        Log.d(javaClass.name, "TINTIN fetchAndInsertPhoto")
         val flickrPhotos: Result<FlickrPhotos> = flickrRepo.fetchFlickrPhoto(location)
         val hikingPhotoEntities: List<HikingPhotoEntity> =
             flickrDataInteractor.mapFlickrPhotoToHikingPhotoEntity(flickrPhotos.getOrThrow())

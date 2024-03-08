@@ -58,18 +58,18 @@ class HomeViewModel @Inject constructor(
             restoreSavedState()
         }
         observeNetwork()
+        observeRoomHikingPhotos()
     }
 
     private fun restoreSavedState() {
         viewModelScope.launch {
             savedStateHandle.get<Boolean>(SAVED_STATE_IS_START)?.let { isStart ->
 
+                if (!isStart) observeLocationAndFetchPhotos()
+
                 updateUiState {
                     it.copy(isStartButton = isStart)
                 }
-
-                observeHikingPhotos() //observes database, doesn't fetch
-
             }
         }
     }
@@ -80,7 +80,7 @@ class HomeViewModel @Inject constructor(
 
             is HomeContract.UiEvents.StartClicked -> {
                 observeLocationAndFetchPhotos()
-                observeHikingPhotos()
+                startLocationServiceUseCase.execute()
                 savedStateHandle.set(SAVED_STATE_IS_START, false)
                 updateUiState { it.copy(isStartButton = false) }
             }
@@ -88,7 +88,11 @@ class HomeViewModel @Inject constructor(
             is HomeContract.UiEvents.StopClicked -> {
                 stopLocationServiceUseCase.execute()
                 savedStateHandle.set(SAVED_STATE_IS_START, true)
-                updateUiState { it.copy(isStartButton = true) }
+                updateUiState {
+                    it.copy(
+                        isStartButton = true,
+                    )
+                }
             }
 
             is HomeContract.UiEvents.ResetClicked -> {
@@ -113,19 +117,21 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun observeLocationAndFetchPhotos() {
-        startLocationServiceUseCase.execute()
-
-        viewModelScope.launch(coExceptionHandler) {
-            locationInMemoryCache.cache.collect { latestLocation ->
-
-                latestLocation?.let { location ->
-                    hikingPhotoRepository.fetchAndInsertPhoto(location)
+        if (!uiState.value.isObservingLocation) {
+            Log.d(javaClass.name, "TINTIN observeLocationAndFetchPhotos()")
+            updateUiState { it.copy(isObservingLocation = true) }
+            viewModelScope.launch(coExceptionHandler) {
+                locationInMemoryCache.cache.collect { latestLocation ->
+                    latestLocation?.let { location ->
+                        hikingPhotoRepository.fetchAndInsertPhoto(location)
+                    }
                 }
             }
         }
     }
 
-    private fun observeHikingPhotos() {
+    private fun observeRoomHikingPhotos() {
+        Log.d(javaClass.name, "observeRoomHikingPhotos()")
         viewModelScope.launch(coExceptionHandler) {
             hikingPhotoRepository.getHikingPhotosStream().collect { hikingPhotos ->
                 updateUiState {
@@ -140,7 +146,7 @@ class HomeViewModel @Inject constructor(
     private fun observeNetwork() {
         viewModelScope.launch {
             networkStateProvider.observeNetwork().collect { isOnline ->
-                Log.d(javaClass.name, "TINTIN is online: $isOnline")
+                Log.d(javaClass.name, "TINTIN observeNetwork(), is online: $isOnline")
                 if (isOnline) {
                     onlineState()
                 } else {
@@ -151,7 +157,8 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun onlineState() {
-        observeLocationAndFetchPhotos()
+        Log.d(javaClass.name, "TINTIN, onlineState()")
+        startLocationServiceUseCase.execute()
         updateUiState {
             it.copy(
                 isStartStopButtonEnabled = true,
@@ -179,26 +186,15 @@ class HomeViewModel @Inject constructor(
             scrollStateToTop = false,
             errorMessage = null,
             isStartStopButtonEnabled = true,
+            isObservingLocation = false
         )
 
         const val SAVED_STATE_IS_START = "saved_state_is_start"
     }
 }
 
-//Reproduce Error
-// GIVEN start tracking > go offline > system process death
-// WHEN app opened
-// THEN Displays error generic error and start/stop is not disabled
-
-// EXPECTED: displays offline message and start/stop is disabled
-
-// Likely the network observer doesn't act quickly enough
-// or because it still has the same state (offline) it doesn't trigger
-
 
 //TODO:
-// - BUG: Fetching two images at a time -> When State is STOP and internet state changes it fetches data
-// - BUG: When offline and process death occurs we don't check the network state
 // - Think about how we want errors to affect the user experience
 //   - If there is an error that benefits from a retry we should retry it
 //   - If one network call returns an error we should handle it silently
@@ -237,6 +233,8 @@ class HomeViewModel @Inject constructor(
 // - Add button to reset photos/hike
 // - Use our ApplicationScope in the Location tracking
 // - iO, Http and FlickrApi errorExceptionHandling done
+// - BUG: When offline and process death occurs we don't check the network state
+// - BUG: Fetching two images at a time -> When State is STOP and internet state changes it fetches data
 
 //TODO: Manual Test Instructions
 // - Standard version
