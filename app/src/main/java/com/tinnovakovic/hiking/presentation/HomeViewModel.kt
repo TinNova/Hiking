@@ -1,5 +1,6 @@
 package com.tinnovakovic.hiking.presentation
 
+import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -46,21 +47,29 @@ class HomeViewModel @Inject constructor(
         if (initializeCalled) return
         initializeCalled = true
 
+        viewModelScope.launch {
+            if (networkStateProvider.isNetworkStateActive()) {
+                Log.d(javaClass.name, "TINTIN, initialise() onlineState()")
+                onlineState()
+            } else {
+                Log.d(javaClass.name, "TINTIN, initialise() offlineState()")
+                offlineState()
+            }
+            restoreSavedState()
+        }
         observeNetwork()
-        restoreSavedState()
     }
 
     private fun restoreSavedState() {
         viewModelScope.launch {
             savedStateHandle.get<Boolean>(SAVED_STATE_IS_START)?.let { isStart ->
-                if (isStart) {
-                    updateUiState { it.copy(isStartButton = true) }
-                    observeHikingPhotos()
-                } else {
-                    updateUiState { it.copy(isStartButton = false) }
-                    observeLocationAndFetchPhotos()
-                    observeHikingPhotos()
+
+                updateUiState {
+                    it.copy(isStartButton = isStart)
                 }
+
+                observeHikingPhotos() //observes database, doesn't fetch
+
             }
         }
     }
@@ -121,8 +130,7 @@ class HomeViewModel @Inject constructor(
             hikingPhotoRepository.getHikingPhotosStream().collect { hikingPhotos ->
                 updateUiState {
                     it.copy(
-                        hikingPhotos = hikingPhotos,
-                        errorMessage = null
+                        hikingPhotos = hikingPhotos
                     )
                 }
             }
@@ -132,23 +140,35 @@ class HomeViewModel @Inject constructor(
     private fun observeNetwork() {
         viewModelScope.launch {
             networkStateProvider.observeNetwork().collect { isOnline ->
-                updateUiState {
-                    if (isOnline) {
-                        observeLocationAndFetchPhotos()
-                        it.copy(
-                            isStartStopButtonEnabled = true,
-                            errorMessage = null
-                        )
-                    } else {
-                        stopLocationServiceUseCase.execute()
-                        it.copy(
-                            isStartStopButtonEnabled = false,
-                            errorMessage = contextProvider.getContext()
-                                .getString(R.string.offline_message)
-                        )
-                    }
+                Log.d(javaClass.name, "TINTIN is online: $isOnline")
+                if (isOnline) {
+                    onlineState()
+                } else {
+                    offlineState()
                 }
             }
+        }
+    }
+
+    private fun onlineState() {
+        observeLocationAndFetchPhotos()
+        updateUiState {
+            it.copy(
+                isStartStopButtonEnabled = true,
+                errorMessage = null,
+            )
+        }
+    }
+
+    private fun offlineState() {
+        Log.d(javaClass.name, "TINTIN, offlineState()")
+        stopLocationServiceUseCase.execute()
+        updateUiState {
+            it.copy(
+                isStartStopButtonEnabled = false,
+                errorMessage = contextProvider.getContext()
+                    .getString(R.string.offline_message),
+            )
         }
     }
 
@@ -158,15 +178,26 @@ class HomeViewModel @Inject constructor(
             hikingPhotos = listOf(),
             scrollStateToTop = false,
             errorMessage = null,
-            isStartStopButtonEnabled = true
+            isStartStopButtonEnabled = true,
         )
 
         const val SAVED_STATE_IS_START = "saved_state_is_start"
     }
 }
 
+//Reproduce Error
+// GIVEN start tracking > go offline > system process death
+// WHEN app opened
+// THEN Displays error generic error and start/stop is not disabled
+
+// EXPECTED: displays offline message and start/stop is disabled
+
+// Likely the network observer doesn't act quickly enough
+// or because it still has the same state (offline) it doesn't trigger
+
+
 //TODO:
-// - BUG: Fetching two images at a time
+// - BUG: Fetching two images at a time -> When State is STOP and internet state changes it fetches data
 // - BUG: When offline and process death occurs we don't check the network state
 // - Think about how we want errors to affect the user experience
 //   - If there is an error that benefits from a retry we should retry it

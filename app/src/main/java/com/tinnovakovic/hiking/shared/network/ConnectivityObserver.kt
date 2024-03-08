@@ -4,5 +4,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ConnectivityObserver {
 
-    fun observerIsOnline() : Flow<Boolean>
+    fun observerIsOnline(): Flow<Boolean>
+
+    fun isOnline(): Boolean
 }

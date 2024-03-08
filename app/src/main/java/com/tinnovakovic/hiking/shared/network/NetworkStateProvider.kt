@@ -4,6 +4,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface NetworkStateProvider {
 
+    suspend fun isNetworkStateActive(): Boolean
+
     fun observeNetwork(): Flow<Boolean>
 
 }
