@@ -9,12 +9,12 @@ import com.tinnovakovic.hiking.data.photo.HikingPhotoRepository
 import com.tinnovakovic.hiking.domain.location.StartLocationServiceUseCase
 import com.tinnovakovic.hiking.domain.location.StopLocationServiceUseCase
 import com.tinnovakovic.hiking.shared.ContextProvider
+import com.tinnovakovic.hiking.shared.ExceptionHandler
 import com.tinnovakovic.hiking.shared.network.NetworkStateProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,6 +24,7 @@ class HomeViewModel @Inject constructor(
     private val locationInMemoryCache: LocationInMemoryCache,
     private val hikingPhotoRepository: HikingPhotoRepository,
     private val networkStateProvider: NetworkStateProvider,
+    private val exceptionHandler: ExceptionHandler,
     private val contextProvider: ContextProvider,
     private val savedStateHandle: SavedStateHandle
 ) : HomeContract.ViewModel() {
@@ -33,18 +34,15 @@ class HomeViewModel @Inject constructor(
 
     private var initializeCalled = false
 
-    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        val errorMessage = when (throwable) {
-            is IOException -> contextProvider.getContext().getString(R.string.generic_error_message)
-            else -> contextProvider.getContext().getString(R.string.generic_error_message)
-        }
+    private val coExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        val errorMessage = exceptionHandler.getErrorMessage(throwable)
         updateUiState {
             it.copy(errorMessage = errorMessage)
         }
         // keep trying until user stops it or app terminates.
         // try with exponential backoff
-        observeLocationAndFetchPhotos()
-        observeHikingPhotos()
+//        observeLocationAndFetchPhotos()
+//        observeHikingPhotos()
     }
 
     @MainThread
@@ -81,16 +79,19 @@ class HomeViewModel @Inject constructor(
                 savedStateHandle.set(SAVED_STATE_IS_START, false)
                 updateUiState { it.copy(isStartButton = false) }
             }
+
             is HomeContract.UiEvents.StopClicked -> {
                 stopLocationServiceUseCase.execute()
                 savedStateHandle.set(SAVED_STATE_IS_START, true)
                 updateUiState { it.copy(isStartButton = true) }
             }
+
             is HomeContract.UiEvents.ResetClicked -> {
                 viewModelScope.launch {
                     hikingPhotoRepository.clearDatabase()
                 }
             }
+
             is HomeContract.UiEvents.OnDestroy -> stopLocationServiceUseCase.execute()
             is HomeContract.UiEvents.OnResume -> {
                 updateUiState { it.copy(scrollStateToTop = true) }
@@ -109,7 +110,7 @@ class HomeViewModel @Inject constructor(
     private fun observeLocationAndFetchPhotos() {
         startLocationServiceUseCase.execute()
 
-        viewModelScope.launch(exceptionHandler) {
+        viewModelScope.launch(coExceptionHandler) {
             locationInMemoryCache.cache.collect { latestLocation ->
 
                 latestLocation?.let { location ->
@@ -120,7 +121,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun observeHikingPhotos() {
-        viewModelScope.launch {
+        viewModelScope.launch(coExceptionHandler) {
             hikingPhotoRepository.getHikingPhotosStream().collect { hikingPhotos ->
                 updateUiState {
                     it.copy(
@@ -141,7 +142,10 @@ class HomeViewModel @Inject constructor(
                         it.copy(errorMessage = null)
                     } else {
                         stopLocationServiceUseCase.execute()
-                        it.copy(errorMessage = contextProvider.getContext().getString(R.string.offline_message))
+                        it.copy(
+                            errorMessage = contextProvider.getContext()
+                                .getString(R.string.offline_message)
+                        )
                     }
                 }
             }
@@ -170,6 +174,7 @@ class HomeViewModel @Inject constructor(
 // - Display dialog when user clicks reset
 // - Display reset button only where there is data to delete
 // - Check if compose is recomposing a lot, considering using a key with the LazyColumn
+// - What errors do we need to handle from Location?
 
 //DONE:
 // - Save photos in Room

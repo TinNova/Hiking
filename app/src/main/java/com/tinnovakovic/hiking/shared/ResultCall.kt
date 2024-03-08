@@ -11,7 +11,7 @@ import retrofit2.HttpException
 import retrofit2.Response
 import java.lang.RuntimeException
 
-class ResultCall<T>(val delegate: Call<T>) :
+class ResultCall<T>(private val delegate: Call<T>) :
     Call<Result<T>> {
 
     override fun enqueue(callback: Callback<Result<T>>) {
@@ -22,12 +22,17 @@ class ResultCall<T>(val delegate: Call<T>) :
                     response: Response<T>
                 ) {
 
+//                    to test bad response
+//                    val responseBody = FlickrError(stat="fail", code= 100, errorMessage ="Invalid API Key")
+
+
                     if (response.isSuccessful) {
                         val responseBody = when (response.body()) {
                             is FlickrPhotos -> response.body()
                             is FlickrError -> response.body()
                             else -> null
                         }
+
 
                         if (responseBody != null) {
                             when (responseBody) {

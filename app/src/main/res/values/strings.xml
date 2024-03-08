@@ -7,5 +7,11 @@
     <string name="generic_error_message">Oops an unknown error occurred.</string>
     <string name="offline_message">Offline.</string>
 
+    <string name="io_error_message">Looks like you\'re not connected to the internet, reconnect and try again.</string>
+    <string name="flick_error_message">Error code: %1$s. %2$s</string>
+
+    <string name="generic_four_hundred_error_message">Oops, it looks like something has gone wrong on your side, please try again.</string>
+    <string name="generic_five_hundred_error_message">Oops, it looks like something has gone wrong on our side, please try again.</string>
+    <string name="unknown_message">Something has gone wrong, if you see this message often please contact us.</string>
 
 </resources>

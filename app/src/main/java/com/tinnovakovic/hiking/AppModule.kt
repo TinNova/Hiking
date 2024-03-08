@@ -12,6 +12,8 @@ import com.tinnovakovic.hiking.data.photo.HikingPhotoDao
 import com.tinnovakovic.hiking.shared.ApplicationCoroutineScope
 import com.tinnovakovic.hiking.shared.ContextProvider
 import com.tinnovakovic.hiking.shared.ContextProviderImpl
+import com.tinnovakovic.hiking.shared.ExceptionHandler
+import com.tinnovakovic.hiking.shared.ExceptionHandlerImpl
 import com.tinnovakovic.hiking.shared.network.ConnectivityObserver
 import com.tinnovakovic.hiking.shared.network.ConnectivityObserverImpl
 import com.tinnovakovic.hiking.shared.network.NetworkStateProvider
@@ -77,5 +79,11 @@ object AppModule {
     @Provides
     fun provideSearchDAO(appDatabase: HikingDatabase): HikingPhotoDao {
         return appDatabase.hikingPhotoDao()
+    }
+
+    @Singleton
+    @Provides
+    fun providesErrorHandler(contextProvider: ContextProvider): ExceptionHandler {
+        return ExceptionHandlerImpl(contextProvider)
     }
 }
