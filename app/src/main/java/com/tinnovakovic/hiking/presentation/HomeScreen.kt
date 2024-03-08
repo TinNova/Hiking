@@ -78,8 +78,14 @@ fun HomeScreenContent(
             Modifier
                 .fillMaxWidth()
                 .padding(bottom = MaterialTheme.spacing.small),
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            OutlinedButton(
+                onClick = {
+                    uiAction.invoke(UiEvents.ResetClicked)
+                }) {
+                Text(text = stringResource(R.string.reset))
+            }
             OutlinedButton(
                 onClick = {
                     if (uiState.isStartButton) {

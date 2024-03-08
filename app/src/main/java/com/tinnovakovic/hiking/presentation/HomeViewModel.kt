@@ -81,14 +81,16 @@ class HomeViewModel @Inject constructor(
                 savedStateHandle.set(SAVED_STATE_IS_START, false)
                 updateUiState { it.copy(isStartButton = false) }
             }
-
             is HomeContract.UiEvents.StopClicked -> {
                 stopLocationServiceUseCase.execute()
                 savedStateHandle.set(SAVED_STATE_IS_START, true)
                 updateUiState { it.copy(isStartButton = true) }
-
             }
-
+            is HomeContract.UiEvents.ResetClicked -> {
+                viewModelScope.launch {
+                    hikingPhotoRepository.clearDatabase()
+                }
+            }
             is HomeContract.UiEvents.OnDestroy -> stopLocationServiceUseCase.execute()
             is HomeContract.UiEvents.OnResume -> {
                 updateUiState { it.copy(scrollStateToTop = true) }
@@ -162,11 +164,12 @@ class HomeViewModel @Inject constructor(
 //   - How to handle these states
 //      - Offline but user presses start/stop -> offline message should display and network calls should be blocked to prevent Http IO Exception
 // - Check if compose is recomposing a lot, considering using a key with the LazyColumn
-// - Add button to reset photos/hike
 // - Add Error handling, check all error FlickrApi can send and exponential backoff, see android offline documentation
 // - Observe state of notification and location permission
 // - Improve error handling infinite loop
 // - Improve notification messaging
+// - Use our ApplicationScope in the Location tracking
+// - Display dialog when user clicks reset
 
 //DONE:
 // - Save photos in Room
@@ -174,3 +177,4 @@ class HomeViewModel @Inject constructor(
 //   -- After process death recovery it should be true, then display the images and start location tracking again
 // - Should database return a list of HikingPhotoEntity or HikingPhoto? Check offline app documentation
 // - Observe internet state on initialise
+// - Add button to reset photos/hike

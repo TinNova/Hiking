@@ -27,6 +27,10 @@ class HikingPhotoRepository @Inject constructor(
         insertDistinctPhoto(hikingPhotoEntities)
     }
 
+    suspend fun clearDatabase() {
+        hikingPhotoDao.deleteAll()
+    }
+
     private suspend fun insertDistinctPhoto(hikingPhotoEntities: List<HikingPhotoEntity>) {
         hikingPhotoEntities.forEach { photo ->
             val result: Array<Long> = hikingPhotoDao.insertHikingPhoto(photo)

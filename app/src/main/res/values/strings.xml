@@ -3,9 +3,9 @@
 
     <string name="start">Start</string>
     <string name="stop">Stop</string>
+    <string name="reset">Reset</string>
     <string name="generic_error_message">Oops an unknown error occurred.</string>
     <string name="offline_message">Offline.</string>
-
 
 
 </resources>
