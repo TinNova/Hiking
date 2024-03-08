@@ -35,14 +35,10 @@ class HomeViewModel @Inject constructor(
     private var initializeCalled = false
 
     private val coExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        val errorMessage = exceptionHandler.getErrorMessage(throwable)
+        val errorMessage = exceptionHandler.execute(throwable)
         updateUiState {
             it.copy(errorMessage = errorMessage)
         }
-        // keep trying until user stops it or app terminates.
-        // try with exponential backoff
-//        observeLocationAndFetchPhotos()
-//        observeHikingPhotos()
     }
 
     @MainThread
@@ -139,10 +135,14 @@ class HomeViewModel @Inject constructor(
                 updateUiState {
                     if (isOnline) {
                         observeLocationAndFetchPhotos()
-                        it.copy(errorMessage = null)
+                        it.copy(
+                            isStartStopButtonEnabled = true,
+                            errorMessage = null
+                        )
                     } else {
                         stopLocationServiceUseCase.execute()
                         it.copy(
+                            isStartStopButtonEnabled = false,
                             errorMessage = contextProvider.getContext()
                                 .getString(R.string.offline_message)
                         )
@@ -157,7 +157,8 @@ class HomeViewModel @Inject constructor(
             isStartButton = true,
             hikingPhotos = listOf(),
             scrollStateToTop = false,
-            errorMessage = null
+            errorMessage = null,
+            isStartStopButtonEnabled = true
         )
 
         const val SAVED_STATE_IS_START = "saved_state_is_start"
@@ -165,16 +166,36 @@ class HomeViewModel @Inject constructor(
 }
 
 //TODO:
+// - BUG: Fetching two images at a time
+// - BUG: When offline and process death occurs we don't check the network state
+// - Think about how we want errors to affect the user experience
+//   - If there is an error that benefits from a retry we should retry it
+//   - If one network call returns an error we should handle it silently
+//   - Not all errors need to be displayed, many can be silent errors that print to the log only
 // - Add Error handling, check all error FlickrApi can send and exponential backoff, see android offline documentation
 //   - How to handle these states
 //      - Offline but user presses start/stop -> offline message should display and network calls should be blocked to prevent Http IO Exception
 // - Observe state of notification and location permission
 // - Improve error handling infinite loop
+// - Check if compose is recomposing a lot, considering using a key with the LazyColumn
+// - What errors do we need to handle from Location?
 // - Improve notification messaging
 // - Display dialog when user clicks reset
 // - Display reset button only where there is data to delete
-// - Check if compose is recomposing a lot, considering using a key with the LazyColumn
-// - What errors do we need to handle from Location?
+// - All IOException not being caught as one in ExceptionHandlerImpl
+
+//TODO: Error Handling Ideas
+// - First retry an error, if it fails after three total attempt
+//   display and error for a few seconds and carry on
+
+//TODO: No Internet Ideas
+// - If there's no internet we should stop fetching a user location and
+//   photos until their internet is back
+//   - Pressing start and stop should become disabled until back online
+//     and when back online continue from the state the user was last on
+//      - SystemDeath stores the state of the button already for us
+// - PHASE 2 - We can continue to track their location and fetch all
+//   the photos they should have received at the time when back online
 
 //DONE:
 // - Save photos in Room
@@ -184,6 +205,7 @@ class HomeViewModel @Inject constructor(
 // - Observe internet state on initialise
 // - Add button to reset photos/hike
 // - Use our ApplicationScope in the Location tracking
+// - iO, Http and FlickrApi errorExceptionHandling done
 
 //TODO: Manual Test Instructions
 // - Standard version

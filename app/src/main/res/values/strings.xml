@@ -14,4 +14,6 @@
     <string name="generic_five_hundred_error_message">Oops, it looks like something has gone wrong on our side, please try again.</string>
     <string name="unknown_message">Something has gone wrong, if you see this message often please contact us.</string>
 
+    <string name="generic_network_error_message">There was an image we couldn\'t download, but it\'s OK, we\'ll still try to get the next one.</string>
+
 </resources>

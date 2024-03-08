@@ -9,7 +9,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.HttpException
 import retrofit2.Response
-import java.lang.RuntimeException
 
 class ResultCall<T>(private val delegate: Call<T>) :
     Call<Result<T>> {
@@ -67,7 +66,7 @@ class ResultCall<T>(private val delegate: Call<T>) :
                 override fun onFailure(call: Call<T>, t: Throwable) {
                     callback.onResponse(
                         this@ResultCall,
-                        Response.success(Result.failure(RuntimeException(t.message, t)))
+                        Response.success(Result.failure(java.lang.Exception(t.message, t)))
                     )
                 }
             }

@@ -16,6 +16,7 @@ interface HomeContract {
         val hikingPhotos: List<HikingPhoto>,
         val scrollStateToTop: Boolean,
         val errorMessage: String?,
+        val isStartStopButtonEnabled: Boolean
     ) : BaseUiState {}
 
     sealed class UiEvents : BaseUiEvent {

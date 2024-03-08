@@ -87,6 +87,7 @@ fun HomeScreenContent(
                 Text(text = stringResource(R.string.reset))
             }
             OutlinedButton(
+                enabled = uiState.isStartStopButtonEnabled,
                 onClick = {
                     if (uiState.isStartButton) {
                         uiAction.invoke(UiEvents.StartClicked)
@@ -120,8 +121,6 @@ fun HomeScreenContent(
                 )
             }
         }
-
-
     }
 }
 
