@@ -55,7 +55,7 @@ class ConnectivityObserverImpl @Inject constructor(
             awaitClose {
                 connectivityManager.unregisterNetworkCallback(callback)
             }
-        }.distinctUntilChanged()
+        }.distinctUntilChanged() //flowOn --> To change the thread it's on
     }
 
 }

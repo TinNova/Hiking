@@ -16,8 +16,6 @@ import com.tinnovakovic.hiking.shared.ExceptionHandler
 import com.tinnovakovic.hiking.shared.ExceptionHandlerImpl
 import com.tinnovakovic.hiking.shared.network.ConnectivityObserver
 import com.tinnovakovic.hiking.shared.network.ConnectivityObserverImpl
-import com.tinnovakovic.hiking.shared.network.NetworkStateProvider
-import com.tinnovakovic.hiking.shared.network.NetworkStateProviderImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -46,14 +44,6 @@ object AppModule {
     @Provides
     fun provideFuseClient(@ApplicationContext context: Context) =
         LocationServices.getFusedLocationProviderClient(context)
-
-    @Singleton
-    @Provides
-    fun provideNetworkStateProvider(
-        applicationCoroutineScope: ApplicationCoroutineScope,
-        connectivityObserver: ConnectivityObserver
-    ): NetworkStateProvider =
-        NetworkStateProviderImpl(applicationCoroutineScope, connectivityObserver)
 
     @Provides
     @Singleton

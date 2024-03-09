@@ -11,7 +11,7 @@ import com.tinnovakovic.hiking.domain.location.StartLocationServiceUseCase
 import com.tinnovakovic.hiking.domain.location.StopLocationServiceUseCase
 import com.tinnovakovic.hiking.shared.ContextProvider
 import com.tinnovakovic.hiking.shared.ExceptionHandler
-import com.tinnovakovic.hiking.shared.network.NetworkStateProvider
+import com.tinnovakovic.hiking.shared.network.ConnectivityObserver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +24,7 @@ class HomeViewModel @Inject constructor(
     private val stopLocationServiceUseCase: StopLocationServiceUseCase,
     private val locationInMemoryCache: LocationInMemoryCache,
     private val hikingPhotoRepository: HikingPhotoRepository,
-    private val networkStateProvider: NetworkStateProvider,
+    private val connectivityObserver: ConnectivityObserver,
     private val exceptionHandler: ExceptionHandler,
     private val contextProvider: ContextProvider,
     private val savedStateHandle: SavedStateHandle
@@ -48,7 +48,7 @@ class HomeViewModel @Inject constructor(
         initializeCalled = true
 
         viewModelScope.launch {
-            if (networkStateProvider.isNetworkStateActive()) {
+            if (connectivityObserver.isOnline()) {
                 Log.d(javaClass.name, "TINTIN, initialise() onlineState()")
                 onlineState()
             } else {
@@ -145,7 +145,7 @@ class HomeViewModel @Inject constructor(
 
     private fun observeNetwork() {
         viewModelScope.launch {
-            networkStateProvider.observeNetwork().collect { isOnline ->
+            connectivityObserver.observerIsOnline().collect { isOnline ->
                 Log.d(javaClass.name, "TINTIN observeNetwork(), is online: $isOnline")
                 if (isOnline) {
                     onlineState()
@@ -193,23 +193,16 @@ class HomeViewModel @Inject constructor(
     }
 }
 
-
 //TODO:
-// - Think about how we want errors to affect the user experience
-//   - If there is an error that benefits from a retry we should retry it
-//   - If one network call returns an error we should handle it silently
-//   - Not all errors need to be displayed, many can be silent errors that print to the log only
+// - Is LocationInMemoryCache the right term for what it is?
 // - Add Error handling, check all error FlickrApi can send and exponential backoff, see android offline documentation
-//   - How to handle these states
-//      - Offline but user presses start/stop -> offline message should display and network calls should be blocked to prevent Http IO Exception
 // - Observe state of notification and location permission
-// - Improve error handling infinite loop
 // - Check if compose is recomposing a lot, considering using a key with the LazyColumn
 // - What errors do we need to handle from Location?
-// - Improve notification messaging
-// - Display dialog when user clicks reset
-// - Display reset button only where there is data to delete
+// - Display dialog when user clicks reset asking user if they are certain
 // - All IOException not being caught as one in ExceptionHandlerImpl
+// - Display button that scrolls to top when a new photo is added and lazyColumn is not on first item
+// - Display reset button only where there is data to delete (optional)
 
 //TODO: Error Handling Ideas
 // - First retry an error, if it fails after three total attempt
@@ -235,6 +228,8 @@ class HomeViewModel @Inject constructor(
 // - iO, Http and FlickrApi errorExceptionHandling done
 // - BUG: When offline and process death occurs we don't check the network state
 // - BUG: Fetching two images at a time -> When State is STOP and internet state changes it fetches data
+// - Not all errors need to be displayed, many can be silent errors that print to the log only
+// - Improve error handling infinite loop
 
 //TODO: Manual Test Instructions
 // - Standard version
