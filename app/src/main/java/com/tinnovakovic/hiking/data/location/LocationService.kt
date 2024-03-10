@@ -8,6 +8,8 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.tinnovakovic.hiking.R
+import com.tinnovakovic.hiking.data.location.LocationEmission.LocationException
+import com.tinnovakovic.hiking.data.location.LocationEmission.LocationValue
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,17 +54,20 @@ class LocationService : Service() {
 
         locationClient
             .getLocationUpdates()
-            .catch { e -> e.printStackTrace() }
+
             .onEach { location ->
                 val updatedNotification = notification.setContentText(
                     "Location recently updated"
                 )
                 Log.d("TINTIN", "LocationService: location: $location")
                 notificationManager.notify(LOCATION_NOTIFICATION_ID, updatedNotification.build())
-                locationMemoryCache.updateCache(location)
+                locationMemoryCache.updateCache(LocationValue(location))
+            }.catch { e ->
+                e.printStackTrace()
+                Log.d("TINTIN", "LocationClient: exception caught")
+                locationMemoryCache.updateCache(LocationException(e))
             }
             .launchIn(serviceScope)
-
 
         startForeground(LOCATION_NOTIFICATION_ID, notification.build())
 
@@ -75,7 +80,7 @@ class LocationService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(javaClass.name, "onDestroy: serviceCoroutine canceled")
+        Log.d(javaClass.name, "TINTIN onDestroy: serviceCoroutine canceled $serviceScope")
         serviceScope.cancel()
     }
 

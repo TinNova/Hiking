@@ -5,6 +5,7 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.tinnovakovic.hiking.R
+import com.tinnovakovic.hiking.data.location.LocationEmission
 import com.tinnovakovic.hiking.data.location.LocationInMemoryCache
 import com.tinnovakovic.hiking.data.photo.HikingPhotoRepository
 import com.tinnovakovic.hiking.domain.location.StartLocationServiceUseCase
@@ -26,7 +27,7 @@ class HomeViewModel @Inject constructor(
     private val startLocationServiceUseCase: StartLocationServiceUseCase,
     private val stopLocationServiceUseCase: StopLocationServiceUseCase,
     private val locationInMemoryCache: LocationInMemoryCache,
-    private val hikingPhotoRepository: HikingPhotoRepository,
+    private val hikingPhotoRepo: HikingPhotoRepository,
     private val connectivityObserver: ConnectivityObserver,
     private val exceptionHandler: ExceptionHandler,
     private val contextProvider: ContextProvider,
@@ -39,6 +40,10 @@ class HomeViewModel @Inject constructor(
     private var initializeCalled = false
 
     private val coExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        handleException(throwable)
+    }
+
+    private fun handleException(throwable: Throwable) {
         val errorMessage = exceptionHandler.execute(throwable)
         updateUiState {
             it.copy(errorMessage = errorMessage)
@@ -89,18 +94,12 @@ class HomeViewModel @Inject constructor(
             }
 
             is HomeContract.UiEvents.StopClicked -> {
-                stopLocationServiceUseCase.execute()
-                savedStateHandle.set(SAVED_STATE_IS_START, true)
-                updateUiState {
-                    it.copy(
-                        isStartButton = true,
-                    )
-                }
+                stopLocationServiceAndResetStartButton()
             }
 
             is HomeContract.UiEvents.ResetClicked -> {
                 viewModelScope.launch {
-                    hikingPhotoRepository.clearDatabase()
+                    hikingPhotoRepo.clearDatabase()
                 }
             }
 
@@ -119,13 +118,32 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun stopLocationServiceAndResetStartButton() {
+        stopLocationServiceUseCase.execute()
+        savedStateHandle.set(SAVED_STATE_IS_START, true)
+        updateUiState {
+            it.copy(
+                isStartButton = true,
+            )
+        }
+    }
+
     private fun observeLocationAndFetchPhotos() {
         if (!uiState.value.isObservingLocation) {
             Log.d(javaClass.name, "TINTIN observeLocationAndFetchPhotos()")
             updateUiState { it.copy(isObservingLocation = true) }
             locationInMemoryCache.cache.onEach { latestLocation ->
                 latestLocation?.let { location ->
-                    hikingPhotoRepository.fetchAndInsertPhoto(location)
+                    when (location) {
+                        is LocationEmission.LocationValue -> {
+                            Log.d(javaClass.name, "TINTIN observeLocationAndFetchPhotos() location: ${location.location}")
+                            hikingPhotoRepo.fetchAndInsertPhoto(location.location)}
+                        is LocationEmission.LocationException -> {
+                            Log.d(javaClass.name, "TINTIN observeLocationAndFetchPhotos() location: ${location.throwable.message}")
+                            handleException(location.throwable) //not sending to CoroutineExceptionHandler as it will cancel fetchAndInsertPhoto()
+                            stopLocationServiceAndResetStartButton()
+                        }
+                    }
                 }
             }.launchIn(viewModelScope + coExceptionHandler)
         }
@@ -133,9 +151,9 @@ class HomeViewModel @Inject constructor(
 
     private fun observeRoomHikingPhotos() {
         Log.d(javaClass.name, "observeRoomHikingPhotos()")
-        hikingPhotoRepository
+        hikingPhotoRepo
             .getHikingPhotosStream()
-            .onEach { hikingPhotos -> updateUiState { it.copy(hikingPhotos = hikingPhotos) } }
+            .onEach { hikingPhotos -> updateUiState { it.copy(hikingPhotos = hikingPhotos, errorMessage = null) } }
             .launchIn(viewModelScope + coExceptionHandler)
     }
 
@@ -226,6 +244,8 @@ class HomeViewModel @Inject constructor(
 // - BUG: Fetching two images at a time -> When State is STOP and internet state changes it fetches data
 // - Not all errors need to be displayed, many can be silent errors that print to the log only
 // - Improve error handling infinite loop
+// - Catch exception where location is not provided
+
 
 //TODO: Manual Test Instructions
 // - Standard version
