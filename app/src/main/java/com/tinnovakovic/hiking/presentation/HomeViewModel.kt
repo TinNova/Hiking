@@ -229,8 +229,8 @@ class HomeViewModel @Inject constructor(
 }
 
 //TODO:
-// - Is LocationInMemoryCache the right term for what it is? LocationStateFlowProvider and StateFlowProvider
 // - Check if compose is recomposing a lot, considering using a key with the LazyColumn
+// - Is LocationInMemoryCache the right term for what it is? LocationStateFlowProvider and StateFlowProvider
 // - Take screenshots, gifs and add to ReadMe
 // - What errors do we need to handle from Location?
 // - Inject Dispatchers for testing purposes

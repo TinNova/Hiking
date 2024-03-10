@@ -1,5 +1,8 @@
 package com.tinnovakovic.hiking.data.photo.models
 
-data class HikingPhoto(
+import androidx.compose.runtime.Stable
+
+@Stable
+class HikingPhoto(
     val photo: String,
 )

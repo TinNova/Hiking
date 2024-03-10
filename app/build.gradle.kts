@@ -7,7 +7,7 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
-val composeVersion = "1.6.1"
+val composeVersion = "1.6.3"
 val lifecycleVersion = "2.7.0"
 val retrofitVersion = "2.9.0"
 val jUnitVersion = "5.8.2"
@@ -28,7 +28,10 @@ android {
     }
 
     packagingOptions {
-        resources.excludes.add("META-INF/*")
+        resources.excludes += setOf(
+            "META-INF/LICENSE.md",
+            "META-INF/LICENSE-notice.md"
+        )
     }
 
     buildFeatures {
@@ -47,8 +50,16 @@ android {
         val properties = Properties()
         properties.load(project.rootProject.file("local.properties").inputStream())
 
-        buildConfigField("String", "FLICKR_API_KEY", "\"${properties.getProperty("FLICKR_API_KEY")}\"")
-        buildConfigField("String", "FLICKR_SECRET", "\"${properties.getProperty("FLICKR_SECRET")}\"")
+        buildConfigField(
+            "String",
+            "FLICKR_API_KEY",
+            "\"${properties.getProperty("FLICKR_API_KEY")}\""
+        )
+        buildConfigField(
+            "String",
+            "FLICKR_SECRET",
+            "\"${properties.getProperty("FLICKR_SECRET")}\""
+        )
     }
 
     buildTypes {
@@ -100,7 +111,6 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.1.0")
     implementation("com.google.android.gms:play-services-base:18.3.0")
 
-
     //Jetpack Compose
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
@@ -126,15 +136,15 @@ dependencies {
     //Dagger Hilt
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     implementation("org.junit.jupiter:junit-jupiter:5.8.2")
-    kapt ("com.google.dagger:hilt-compiler:$hiltVersion")
+    kapt("com.google.dagger:hilt-compiler:$hiltVersion")
 
     // For instrumentation tests
-    androidTestImplementation  ("com.google.dagger:hilt-android-testing:$hiltVersion")
-    kaptAndroidTest ("com.google.dagger:hilt-compiler:$hiltVersion")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
+    kaptAndroidTest("com.google.dagger:hilt-compiler:$hiltVersion")
 
     // For local unit tests
-    testImplementation ("com.google.dagger:hilt-android-testing:$hiltVersion")
-    kaptTest ("com.google.dagger:hilt-compiler:$hiltVersion")
+    testImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
+    kaptTest("com.google.dagger:hilt-compiler:$hiltVersion")
 
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
     implementation("androidx.compose.material3:material3:1.2.0")

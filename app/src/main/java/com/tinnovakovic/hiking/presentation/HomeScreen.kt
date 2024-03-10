@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -129,12 +130,14 @@ fun HomeScreenContent(
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
             reverseLayout = true,
             state = scrollState
         ) {
-            items(uiState.hikingPhotos.size) { index ->
-                val hikingPhoto = uiState.hikingPhotos[index]
+            items(
+                items = uiState.hikingPhotos,
+                key = { it.photo }
+            ) { hikingPhoto ->
+
                 AsyncImage(
                     modifier = Modifier.padding(vertical = MaterialTheme.spacing.small),
                     model = hikingPhoto.photo,
