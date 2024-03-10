@@ -153,4 +153,4 @@ fun ErrorText(errorMessage: String) {
     )
 }
 
-private const val ERROR_MESSAGE_TIMEOUT = 2500L
+private const val ERROR_MESSAGE_TIMEOUT = 4000L
