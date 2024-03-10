@@ -15,6 +15,6 @@
     <string name="unknown_message">Something has gone wrong, if you see this message often please contact us.</string>
 
     <string name="generic_network_error_message">There was an image we couldn\'t download, but it\'s OK, we\'ll still try to get the next one.</string>
-    <string name="location_permission_error_message">Location Permission is not provided. This app cannot function without Location Permissions. Please allow it and press start to try again.</string>
+    <string name="location_permission_error_message">Location Permission is not been allowed. Please allow it and press the start button to try again.</string>
 
 </resources>

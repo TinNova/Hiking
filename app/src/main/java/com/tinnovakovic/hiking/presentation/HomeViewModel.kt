@@ -230,17 +230,15 @@ class HomeViewModel @Inject constructor(
 
 //TODO:
 // - Is LocationInMemoryCache the right term for what it is? LocationStateFlowProvider and StateFlowProvider
-// - Add Error handling, check all error FlickrApi can send and exponential backoff, see android offline documentation
 // - Check if compose is recomposing a lot, considering using a key with the LazyColumn
-// Error Handling Ideas
-//    - First retry an error, if it fails after three total attempt
-//      display and error for a few seconds and carry on <-- disappearing error message
 // - Take screenshots, gifs and add to ReadMe
 // - What errors do we need to handle from Location?
 // - Inject Dispatchers for testing purposes
 
 //TODO Optional:
 // - Display button that scrolls to top when a new photo is added and lazyColumn is not on first item
+// - Add Error handling, check all error FlickrApi can send and exponential backoff, see android offline documentation
+//   - Also check coroutine course on retry
 // - Display dialog when user clicks reset asking user if they are certain
 // - All IOException not being caught as one in ExceptionHandlerImpl
 // - Display reset button only where there is data to delete (optional)
@@ -269,6 +267,7 @@ class HomeViewModel @Inject constructor(
 // - Improve error handling infinite loop
 // - Catch exception where location is not provided
 // - Display no location error message and make it disappear when user has location and presses start
+// - display and error for a few seconds and carry on <-- disappearing error message
 
 
 //TODO: Manual Test Instructions
