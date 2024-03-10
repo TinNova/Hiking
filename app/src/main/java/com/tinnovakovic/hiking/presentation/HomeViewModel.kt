@@ -15,7 +15,10 @@ import com.tinnovakovic.hiking.shared.network.ConnectivityObserver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import javax.inject.Inject
 
 @HiltViewModel
@@ -120,40 +123,30 @@ class HomeViewModel @Inject constructor(
         if (!uiState.value.isObservingLocation) {
             Log.d(javaClass.name, "TINTIN observeLocationAndFetchPhotos()")
             updateUiState { it.copy(isObservingLocation = true) }
-            viewModelScope.launch(coExceptionHandler) {
-                locationInMemoryCache.cache.collect { latestLocation ->
-                    latestLocation?.let { location ->
-                        hikingPhotoRepository.fetchAndInsertPhoto(location)
-                    }
+            locationInMemoryCache.cache.onEach { latestLocation ->
+                latestLocation?.let { location ->
+                    hikingPhotoRepository.fetchAndInsertPhoto(location)
                 }
-            }
+            }.launchIn(viewModelScope + coExceptionHandler)
         }
     }
 
     private fun observeRoomHikingPhotos() {
         Log.d(javaClass.name, "observeRoomHikingPhotos()")
-        viewModelScope.launch(coExceptionHandler) {
-            hikingPhotoRepository.getHikingPhotosStream().collect { hikingPhotos ->
-                updateUiState {
-                    it.copy(
-                        hikingPhotos = hikingPhotos
-                    )
-                }
-            }
-        }
+        hikingPhotoRepository
+            .getHikingPhotosStream()
+            .onEach { hikingPhotos -> updateUiState { it.copy(hikingPhotos = hikingPhotos) } }
+            .launchIn(viewModelScope + coExceptionHandler)
     }
 
     private fun observeNetwork() {
-        viewModelScope.launch {
-            connectivityObserver.observerIsOnline().collect { isOnline ->
+        connectivityObserver
+            .observerIsOnline()
+            .onEach { isOnline ->
                 Log.d(javaClass.name, "TINTIN observeNetwork(), is online: $isOnline")
-                if (isOnline) {
-                    onlineState()
-                } else {
-                    offlineState()
-                }
+                if (isOnline) onlineState() else offlineState()
             }
-        }
+            .launchIn(viewModelScope)
     }
 
     private fun onlineState() {
@@ -194,19 +187,22 @@ class HomeViewModel @Inject constructor(
 }
 
 //TODO:
-// - Is LocationInMemoryCache the right term for what it is?
+// - Observe state of notification and location permission and redisplay it if permission is turned off
+// - Is LocationInMemoryCache the right term for what it is? LocationStateFlowProvider and StateFlowProvider
 // - Add Error handling, check all error FlickrApi can send and exponential backoff, see android offline documentation
-// - Observe state of notification and location permission
 // - Check if compose is recomposing a lot, considering using a key with the LazyColumn
+// Error Handling Ideas
+//    - First retry an error, if it fails after three total attempt
+//      display and error for a few seconds and carry on
+// - Take screenshots, gifs and add to ReadMe
 // - What errors do we need to handle from Location?
+// - Inject Dispatchers for testing purposes
+
+//TODO Optional:
+// - Display button that scrolls to top when a new photo is added and lazyColumn is not on first item
 // - Display dialog when user clicks reset asking user if they are certain
 // - All IOException not being caught as one in ExceptionHandlerImpl
-// - Display button that scrolls to top when a new photo is added and lazyColumn is not on first item
 // - Display reset button only where there is data to delete (optional)
-
-//TODO: Error Handling Ideas
-// - First retry an error, if it fails after three total attempt
-//   display and error for a few seconds and carry on
 
 //TODO: No Internet Ideas
 // - If there's no internet we should stop fetching a user location and
