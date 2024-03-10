@@ -29,7 +29,6 @@ class LocationService : Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-
     override fun onBind(p0: Intent?): IBinder? {
         return null
     }
@@ -76,6 +75,7 @@ class LocationService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d(javaClass.name, "onDestroy: serviceCoroutine canceled")
         serviceScope.cancel()
     }
 
