@@ -108,15 +108,12 @@ fun HomeScreenContent(
         }
 
         if (uiState.errorMessage != null) {
-            Log.d("TINTIN", "TINTIN errormessage: ")
             when (uiState.errorMessage) {
                 is ErrorToUser.LocationError -> {
-                    Log.d("TINTIN", "TINTIN errormessage location: ${uiState.errorMessage}")
                     ErrorText(uiState.errorMessage.message)
                 }
 
                 is ErrorToUser.GenericError -> {
-                    Log.d("TINTIN", "TINTIN errormessage generic: ${uiState.errorMessage}")
                     var show by remember { mutableStateOf(true) }
                     LaunchedEffect(key1 = Unit) {
                         delay(ERROR_MESSAGE_TIMEOUT)

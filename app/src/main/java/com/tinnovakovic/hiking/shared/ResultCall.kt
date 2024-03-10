@@ -43,7 +43,6 @@ class ResultCall<T>(private val delegate: Call<T>) :
                                 }
 
                                 is FlickrError -> {
-                                    //handle it as failure
                                     callback.onResponse(
                                         this@ResultCall,
                                         Response.success(Result.failure(responseBody as Throwable))

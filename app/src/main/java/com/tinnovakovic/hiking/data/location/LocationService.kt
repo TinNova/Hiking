@@ -44,11 +44,11 @@ class LocationService : Service() {
     }
 
     private fun start() {
-        Log.d(javaClass.name, "TINTIN start()")
+        Log.d(javaClass.name, "start()")
 
         val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("Hiking App")
-            .setContentText("Is tracking your location")
+            .setContentTitle(getString(R.string.app_name))
+            .setContentText(getString(R.string.notification_message))
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setOngoing(true) //so you can't swipe it away
 
@@ -57,15 +57,11 @@ class LocationService : Service() {
         locationClient
             .getLocationUpdates()
             .onEach { location ->
-                val updatedNotification = notification.setContentText(
-                    "Location recently updated"
-                )
-                Log.d("TINTIN", "LocationService: location: $location")
+                val updatedNotification = notification.setContentText(getString(R.string.updated_notification_message))
                 notificationManager.notify(LOCATION_NOTIFICATION_ID, updatedNotification.build())
                 locationMemoryCache.updateCache(LocationValue(location))
             }.catch { e ->
                 e.printStackTrace()
-                Log.d("TINTIN", "LocationClient: exception caught")
                 locationMemoryCache.updateCache(LocationException(e))
             }
             .launchIn(serviceScope)
@@ -81,7 +77,7 @@ class LocationService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(javaClass.name, "TINTIN onDestroy: serviceCoroutine canceled $serviceScope")
+        Log.d(javaClass.name, "onDestroy: serviceCoroutine canceled $serviceScope")
         serviceScope.cancel()
     }
 

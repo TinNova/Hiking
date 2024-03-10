@@ -19,9 +19,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import javax.inject.Inject
 
 @HiltViewModel
@@ -60,10 +60,8 @@ class HomeViewModel @Inject constructor(
 
         viewModelScope.launch {
             if (connectivityObserver.isOnline()) {
-                Log.d(javaClass.name, "TINTIN, initialise() onlineState()")
                 onlineState()
             } else {
-                Log.d(javaClass.name, "TINTIN, initialise() offlineState()")
                 offlineState()
             }
             restoreSavedState()
@@ -138,30 +136,23 @@ class HomeViewModel @Inject constructor(
 
     private fun observeLocationAndFetchPhotos() {
         if (!uiState.value.isObservingLocation) {
-            Log.d(javaClass.name, "TINTIN observeLocationAndFetchPhotos()")
             updateUiState { it.copy(isObservingLocation = true) }
             locationInMemoryCache.cache.onEach { latestLocation ->
                 latestLocation?.let { location ->
                     when (location) {
                         is LocationEmission.LocationValue -> {
-                            Log.d(
-                                javaClass.name,
-                                "TINTIN observeLocationAndFetchPhotos() location: ${location.location}"
-                            )
-                            hikingPhotoRepo.fetchAndInsertPhoto(location.location)
+                            viewModelScope.launch(coExceptionHandler) {
+                                hikingPhotoRepo.fetchAndInsertPhoto(location.location)
+                            }
                         }
 
                         is LocationEmission.LocationException -> {
-                            Log.d(
-                                javaClass.name,
-                                "TINTIN observeLocationAndFetchPhotos() location: ${location.throwable.message}"
-                            )
                             handleException(location.throwable) //not sending to CoroutineExceptionHandler as it will cancel fetchAndInsertPhoto()
                             stopLocationServiceAndResetStartButton()
                         }
                     }
                 }
-            }.launchIn(viewModelScope + coExceptionHandler)
+            }.launchIn(viewModelScope)
         }
     }
 
@@ -177,21 +168,23 @@ class HomeViewModel @Inject constructor(
                     )
                 }
             }
-            .launchIn(viewModelScope + coExceptionHandler)
+            .onCompletion {
+                Log.d(javaClass.name, "observeRoomHikingPhotos() onCompletion, throwable: $it")
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun observeNetwork() {
         connectivityObserver
             .observerIsOnline()
             .onEach { isOnline ->
-                Log.d(javaClass.name, "TINTIN observeNetwork(), is online: $isOnline")
+                Log.d(javaClass.name, "observeNetwork(), is online: $isOnline")
                 if (isOnline) onlineState() else offlineState()
             }
             .launchIn(viewModelScope)
     }
 
     private fun onlineState() {
-        Log.d(javaClass.name, "TINTIN, onlineState()")
         startLocationServiceUseCase.execute()
         updateUiState {
             it.copy(
@@ -202,7 +195,6 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun offlineState() {
-        Log.d(javaClass.name, "TINTIN, offlineState()")
         stopLocationServiceUseCase.execute()
         updateUiState {
             it.copy(
@@ -229,8 +221,6 @@ class HomeViewModel @Inject constructor(
 }
 
 //TODO:
-// - Check if compose is recomposing a lot, considering using a key with the LazyColumn
-// - Is LocationInMemoryCache the right term for what it is? LocationStateFlowProvider and StateFlowProvider
 // - Take screenshots, gifs and add to ReadMe
 // - What errors do we need to handle from Location?
 // - Inject Dispatchers for testing purposes
@@ -268,6 +258,7 @@ class HomeViewModel @Inject constructor(
 // - Catch exception where location is not provided
 // - Display no location error message and make it disappear when user has location and presses start
 // - display and error for a few seconds and carry on <-- disappearing error message
+// - Check if compose is recomposing a lot, considering using a key with the LazyColumn
 
 
 //TODO: Manual Test Instructions

@@ -24,7 +24,6 @@ class HikingPhotoRepository @Inject constructor(
     }
 
     suspend fun fetchAndInsertPhoto(location: Location) {
-        Log.d(javaClass.name, "TINTIN fetchAndInsertPhoto")
         val flickrPhotos: Result<FlickrPhotos> = flickrRepo.fetchFlickrPhoto(location)
         val hikingPhotoEntities: List<HikingPhotoEntity> =
             flickrDataInteractor.mapFlickrPhotoToHikingPhotoEntity(flickrPhotos.getOrThrow())
