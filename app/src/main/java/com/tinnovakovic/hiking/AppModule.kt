@@ -16,6 +16,8 @@ import com.tinnovakovic.hiking.shared.ExceptionHandler
 import com.tinnovakovic.hiking.shared.ExceptionHandlerImpl
 import com.tinnovakovic.hiking.shared.network.ConnectivityObserver
 import com.tinnovakovic.hiking.shared.network.ConnectivityObserverImpl
+import com.tinnovakovic.hiking.shared.permission.PermissionProviderImpl
+import com.tinnovakovic.hiking.shared.permission.PermissionProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,8 +39,9 @@ object AppModule {
     @Singleton
     fun bindsLocationClient(
         contextProvider: ContextProvider,
-        client: FusedLocationProviderClient
-    ): LocationClient = LocationClientImpl(contextProvider, client)
+        client: FusedLocationProviderClient,
+        permissionProvider: PermissionProvider
+    ): LocationClient = LocationClientImpl(contextProvider, client, permissionProvider)
 
     @Singleton
     @Provides
@@ -76,4 +79,11 @@ object AppModule {
     fun providesErrorHandler(contextProvider: ContextProvider): ExceptionHandler {
         return ExceptionHandlerImpl(contextProvider)
     }
+
+    @Singleton
+    @Provides
+    fun providesPermissionProvider(contextProvider: ContextProvider): PermissionProvider {
+        return PermissionProviderImpl(contextProvider)
+    }
+
 }

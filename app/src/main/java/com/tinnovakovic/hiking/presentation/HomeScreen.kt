@@ -1,6 +1,7 @@
 package com.tinnovakovic.hiking.presentation
 
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import coil.compose.AsyncImage
 import com.tinnovakovic.hiking.R
 import com.tinnovakovic.hiking.presentation.HomeContract.UiEvents
 import com.tinnovakovic.hiking.shared.DestroyLifecycleHandler
+import com.tinnovakovic.hiking.shared.ErrorToUser
 import com.tinnovakovic.hiking.shared.PauseLifecycleHandler
 import com.tinnovakovic.hiking.shared.ResumeLifecycleHandler
 import com.tinnovakovic.hiking.shared.spacing
@@ -101,10 +103,17 @@ fun HomeScreenContent(
         }
 
         if (uiState.errorMessage != null) {
-            Text(
-                modifier = Modifier.padding(vertical = MaterialTheme.spacing.medium),
-                text = uiState.errorMessage
-            )
+            Log.d("TINTIN", "TINTIN errormessage: ")
+            when (uiState.errorMessage) {
+                is ErrorToUser.LocationError -> {
+                    Log.d("TINTIN", "TINTIN errormessage location: ${uiState.errorMessage}")
+                    ErrorText(uiState.errorMessage.message)
+                }
+                is ErrorToUser.GenericError -> {
+                    Log.d("TINTIN", "TINTIN errormessage generic: ${uiState.errorMessage}")
+                    ErrorText(uiState.errorMessage.message)
+                }
+            }
         }
 
         LazyColumn(
@@ -122,6 +131,14 @@ fun HomeScreenContent(
             }
         }
     }
+}
+
+@Composable
+fun ErrorText(errorMessage: String) {
+    Text( //animate this to display for a few seconds
+        modifier = Modifier.padding(vertical = MaterialTheme.spacing.medium),
+        text = errorMessage
+    )
 }
 
 const val SCROLL_OFFSET = -100

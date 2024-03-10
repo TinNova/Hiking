@@ -44,6 +44,8 @@ class LocationService : Service() {
     }
 
     private fun start() {
+        Log.d(javaClass.name, "TINTIN start()")
+
         val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setContentTitle("Hiking App")
             .setContentText("Is tracking your location")
@@ -54,7 +56,6 @@ class LocationService : Service() {
 
         locationClient
             .getLocationUpdates()
-
             .onEach { location ->
                 val updatedNotification = notification.setContentText(
                     "Location recently updated"

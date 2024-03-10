@@ -11,8 +11,10 @@ import com.tinnovakovic.hiking.data.photo.HikingPhotoRepository
 import com.tinnovakovic.hiking.domain.location.StartLocationServiceUseCase
 import com.tinnovakovic.hiking.domain.location.StopLocationServiceUseCase
 import com.tinnovakovic.hiking.shared.ContextProvider
+import com.tinnovakovic.hiking.shared.ErrorToUser.LocationError
 import com.tinnovakovic.hiking.shared.ExceptionHandler
 import com.tinnovakovic.hiking.shared.network.ConnectivityObserver
+import com.tinnovakovic.hiking.shared.permission.PermissionProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +31,7 @@ class HomeViewModel @Inject constructor(
     private val locationInMemoryCache: LocationInMemoryCache,
     private val hikingPhotoRepo: HikingPhotoRepository,
     private val connectivityObserver: ConnectivityObserver,
+    private val permissionProvider: PermissionProvider,
     private val exceptionHandler: ExceptionHandler,
     private val contextProvider: ContextProvider,
     private val savedStateHandle: SavedStateHandle
@@ -91,6 +94,11 @@ class HomeViewModel @Inject constructor(
                 startLocationServiceUseCase.execute()
                 savedStateHandle.set(SAVED_STATE_IS_START, false)
                 updateUiState { it.copy(isStartButton = false) }
+                if (permissionProvider.hasLocationPermission()) {
+                    updateUiState {
+                        it.copy(errorMessage = null)
+                    }
+                }
             }
 
             is HomeContract.UiEvents.StopClicked -> {
@@ -136,10 +144,18 @@ class HomeViewModel @Inject constructor(
                 latestLocation?.let { location ->
                     when (location) {
                         is LocationEmission.LocationValue -> {
-                            Log.d(javaClass.name, "TINTIN observeLocationAndFetchPhotos() location: ${location.location}")
-                            hikingPhotoRepo.fetchAndInsertPhoto(location.location)}
+                            Log.d(
+                                javaClass.name,
+                                "TINTIN observeLocationAndFetchPhotos() location: ${location.location}"
+                            )
+                            hikingPhotoRepo.fetchAndInsertPhoto(location.location)
+                        }
+
                         is LocationEmission.LocationException -> {
-                            Log.d(javaClass.name, "TINTIN observeLocationAndFetchPhotos() location: ${location.throwable.message}")
+                            Log.d(
+                                javaClass.name,
+                                "TINTIN observeLocationAndFetchPhotos() location: ${location.throwable.message}"
+                            )
                             handleException(location.throwable) //not sending to CoroutineExceptionHandler as it will cancel fetchAndInsertPhoto()
                             stopLocationServiceAndResetStartButton()
                         }
@@ -153,7 +169,14 @@ class HomeViewModel @Inject constructor(
         Log.d(javaClass.name, "observeRoomHikingPhotos()")
         hikingPhotoRepo
             .getHikingPhotosStream()
-            .onEach { hikingPhotos -> updateUiState { it.copy(hikingPhotos = hikingPhotos, errorMessage = null) } }
+            .onEach { hikingPhotos ->
+                updateUiState {
+                    it.copy(
+                        hikingPhotos = hikingPhotos,
+                        errorMessage = null
+                    )
+                }
+            }
             .launchIn(viewModelScope + coExceptionHandler)
     }
 
@@ -184,8 +207,9 @@ class HomeViewModel @Inject constructor(
         updateUiState {
             it.copy(
                 isStartStopButtonEnabled = false,
-                errorMessage = contextProvider.getContext()
-                    .getString(R.string.offline_message),
+                errorMessage = LocationError(
+                    contextProvider.getContext().getString(R.string.offline_message)
+                ),
             )
         }
     }
@@ -205,13 +229,12 @@ class HomeViewModel @Inject constructor(
 }
 
 //TODO:
-// - Observe state of notification and location permission and redisplay it if permission is turned off
 // - Is LocationInMemoryCache the right term for what it is? LocationStateFlowProvider and StateFlowProvider
 // - Add Error handling, check all error FlickrApi can send and exponential backoff, see android offline documentation
 // - Check if compose is recomposing a lot, considering using a key with the LazyColumn
 // Error Handling Ideas
 //    - First retry an error, if it fails after three total attempt
-//      display and error for a few seconds and carry on
+//      display and error for a few seconds and carry on <-- disappearing error message
 // - Take screenshots, gifs and add to ReadMe
 // - What errors do we need to handle from Location?
 // - Inject Dispatchers for testing purposes
@@ -245,6 +268,7 @@ class HomeViewModel @Inject constructor(
 // - Not all errors need to be displayed, many can be silent errors that print to the log only
 // - Improve error handling infinite loop
 // - Catch exception where location is not provided
+// - Display no location error message and make it disappear when user has location and presses start
 
 
 //TODO: Manual Test Instructions

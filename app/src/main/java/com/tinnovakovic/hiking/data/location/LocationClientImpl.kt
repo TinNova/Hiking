@@ -10,8 +10,8 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
-import com.tinnovakovic.hiking.shared.hasLocationPermission
 import com.tinnovakovic.hiking.shared.ContextProvider
+import com.tinnovakovic.hiking.shared.permission.PermissionProvider
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -21,7 +21,8 @@ import javax.inject.Inject
 
 class LocationClientImpl @Inject constructor(
     contextProvider: ContextProvider,
-    private val client: FusedLocationProviderClient
+    private val client: FusedLocationProviderClient,
+    private val permissionProvider: PermissionProvider
 ) : LocationClient {
 
     private val context = contextProvider.getContext()
@@ -30,7 +31,7 @@ class LocationClientImpl @Inject constructor(
     @SuppressLint("MissingPermission")
     override fun getLocationUpdates(): Flow<Location> {
         return callbackFlow {
-            if (!context.hasLocationPermission()) {
+            if (!permissionProvider.hasLocationPermission()) {
                 throw LocationClient.LocationException("Missing location permission")
             }
 

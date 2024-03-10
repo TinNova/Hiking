@@ -1,6 +1,7 @@
 package com.tinnovakovic.hiking.presentation
 
 import com.tinnovakovic.hiking.data.photo.models.HikingPhoto
+import com.tinnovakovic.hiking.shared.ErrorToUser
 import com.tinnovakovic.hiking.shared.mvi.BaseUiEvent
 import com.tinnovakovic.hiking.shared.mvi.BaseUiState
 import com.tinnovakovic.hiking.shared.mvi.BaseViewModel
@@ -15,7 +16,7 @@ interface HomeContract {
         val isStartButton: Boolean,
         val hikingPhotos: List<HikingPhoto>,
         val scrollStateToTop: Boolean,
-        val errorMessage: String?,
+        val errorMessage: ErrorToUser?,
         val isStartStopButtonEnabled: Boolean,
         val isObservingLocation: Boolean
     ) : BaseUiState {}
