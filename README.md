@@ -33,11 +33,11 @@ Use case: Open the app, press start and put the phone in your pocket, then go on
 
 | Initial State | Tracking State | Foreground Notification |
 |     :---:     |     :---:     |     :---:     |
-|<img src="https://i.imgur.com/rVAUvYe.png" width="60%" height="60%" align="centre">|<img src="https://i.imgur.com/UJHK4V6.png" width="60%" height="60%" align="centre">|<img src="https://i.imgur.com/8mwUiTO.png" width="60%" height="60%" align="centre">|
+|<img src="https://i.imgur.com/rVAUvYe.png" width="225px" height="60%" align="centre">|<img src="https://i.imgur.com/UJHK4V6.png" width="225px" height="60%" align="centre">|<img src="https://i.imgur.com/8mwUiTO.png" width="225px" height="60%" align="centre">|
 
 | Not Tracking State | Offline State | Error State |
 |     :---:     |     :---:     |     :---:     |
- |<img src="https://i.imgur.com/WJAStK9.png" width="60%" height="60%" align="centre">|<img src="https://i.imgur.com/BICgjD1.png" width="60%" height="60%" align="centre">|<img src="https://i.imgur.com/Q6R2sXg.png" width="60%" height="60%" align="centre">|
+ |<img src="https://i.imgur.com/WJAStK9.png" width="225px" height="60%" align="centre">|<img src="https://i.imgur.com/BICgjD1.png" width="225px" height="60%" align="centre">|<img src="https://i.imgur.com/Q6R2sXg.png" width="225px" height="60%" align="centre">|
 
 ## To Run The App
 You will need a flickr api key and insert it into local.properties: <br/>
