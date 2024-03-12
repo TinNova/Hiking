@@ -58,15 +58,8 @@ class HomeViewModel @Inject constructor(
         if (initializeCalled) return
         initializeCalled = true
 
-        viewModelScope.launch {
-            if (connectivityObserver.isOnline()) {
-                onlineState()
-            } else {
-                offlineState()
-            }
-            restoreSavedState()
-        }
         observeNetwork()
+        restoreSavedState()
         observeRoomHikingPhotos()
     }
 
@@ -164,7 +157,7 @@ class HomeViewModel @Inject constructor(
                 updateUiState {
                     it.copy(
                         hikingPhotos = hikingPhotos,
-                        errorMessage = null
+                        errorMessage = if (uiState.value.errorMessage !is LocationError) null else uiState.value.errorMessage
                     )
                 }
             }
@@ -176,9 +169,8 @@ class HomeViewModel @Inject constructor(
 
     private fun observeNetwork() {
         connectivityObserver
-            .observerIsOnline()
+            .observeIsOnline()
             .onEach { isOnline ->
-                Log.d(javaClass.name, "observeNetwork(), is online: $isOnline")
                 if (isOnline) onlineState() else offlineState()
             }
             .launchIn(viewModelScope)
@@ -221,7 +213,6 @@ class HomeViewModel @Inject constructor(
 }
 
 //TODO:
-// - Take screenshots, gifs and add to ReadMe
 // - What errors do we need to handle from Location?
 // - Inject Dispatchers for testing purposes
 
@@ -259,7 +250,8 @@ class HomeViewModel @Inject constructor(
 // - Display no location error message and make it disappear when user has location and presses start
 // - display and error for a few seconds and carry on <-- disappearing error message
 // - Check if compose is recomposing a lot, considering using a key with the LazyColumn
-
+// - Take screenshots, gifs and add to ReadMe
+// - Use StateFlow for observing Network, the initial value can be what is returned by the isOnline() method instead of hardcoding it
 
 //TODO: Manual Test Instructions
 // - Standard version

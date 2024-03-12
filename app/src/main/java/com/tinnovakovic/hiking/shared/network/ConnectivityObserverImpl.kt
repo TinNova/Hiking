@@ -4,30 +4,35 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
+import android.util.Log
+import com.tinnovakovic.hiking.shared.ApplicationCoroutineScope
 import com.tinnovakovic.hiking.shared.ContextProvider
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
+import kotlinx.coroutines.flow.SharingStarted.Companion.Lazily
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ConnectivityObserverImpl @Inject constructor(
-    private val contextProvider: ContextProvider
+    private val contextProvider: ContextProvider,
+    private val applicationCoroutineScope: ApplicationCoroutineScope
 ) : ConnectivityObserver {
 
     private val connectivityManager = contextProvider.getContext()
         .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    override fun isOnline(): Boolean {
+    private fun isOnline(): Boolean {
         val activeNetwork = connectivityManager.activeNetwork
-
+        Log.d(javaClass.name, "TINTIN isOnline()")
         return connectivityManager
             .getNetworkCapabilities(activeNetwork)
             ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) ?: false
     }
 
-    override fun observerIsOnline(): Flow<Boolean> {
+    override fun observeIsOnline(): StateFlow<Boolean> {
         return callbackFlow {
             val callback = object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
@@ -55,7 +60,11 @@ class ConnectivityObserverImpl @Inject constructor(
             awaitClose {
                 connectivityManager.unregisterNetworkCallback(callback)
             }
-        }.distinctUntilChanged() //flowOn --> To change the thread it's on
+        }.stateIn(
+            scope = applicationCoroutineScope.coroutineScope,
+            started = Lazily,
+            initialValue = isOnline()
+        )
     }
 
 }

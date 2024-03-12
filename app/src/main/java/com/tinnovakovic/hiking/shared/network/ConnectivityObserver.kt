@@ -1,10 +1,9 @@
 package com.tinnovakovic.hiking.shared.network
 
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface ConnectivityObserver {
 
-    fun observerIsOnline(): Flow<Boolean>
+    fun observeIsOnline(): StateFlow<Boolean>
 
-    fun isOnline(): Boolean
 }

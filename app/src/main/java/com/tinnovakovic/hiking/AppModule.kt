@@ -50,8 +50,10 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesConnectivityObserver(contextProvider: ContextProvider): ConnectivityObserver =
-        ConnectivityObserverImpl(contextProvider)
+    fun providesConnectivityObserver(
+        contextProvider: ContextProvider,
+        applicationCoroutineScope: ApplicationCoroutineScope): ConnectivityObserver =
+        ConnectivityObserverImpl(contextProvider, applicationCoroutineScope)
 
     @Provides
     @Singleton

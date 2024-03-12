@@ -107,6 +107,7 @@ fun HomeScreenContent(
             }
         }
 
+        Log.d(javaClass.name, "TINTIN errorMessage: ${uiState.errorMessage}")
         if (uiState.errorMessage != null) {
             when (uiState.errorMessage) {
                 is ErrorToUser.LocationError -> {
