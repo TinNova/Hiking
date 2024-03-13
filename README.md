@@ -70,7 +70,6 @@ Speculative Features:
 
 #### Technical Debt
 - Unit Testing the HomeViewModel, (it's frustrating having to manually test the app everytime I edit it to ensure regression hasn't occured).
-- Integration Tests connected to Location and Network availability, (again, it's important that the app recovers from loss of internet automatically, tests to ensure this feature hasn't regressed is vital).
 - Retry a failed photo fetch with exponential backoff.
 - Investigate error handling and how suspend errors marry up with flow errors, (error handling works as expected, but it's worth researching it to see if it can be improved).
 
