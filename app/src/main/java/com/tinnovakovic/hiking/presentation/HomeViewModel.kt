@@ -1,6 +1,5 @@
 package com.tinnovakovic.hiking.presentation
 
-import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -150,7 +149,6 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun observeRoomHikingPhotos() {
-        Log.d(javaClass.name, "observeRoomHikingPhotos()")
         hikingPhotoRepo
             .getHikingPhotosStream()
             .onEach { hikingPhotos ->
@@ -161,9 +159,7 @@ class HomeViewModel @Inject constructor(
                     )
                 }
             }
-            .onCompletion {
-                Log.d(javaClass.name, "observeRoomHikingPhotos() onCompletion, throwable: $it")
-            }
+            .onCompletion {}
             .launchIn(viewModelScope)
     }
 
@@ -198,7 +194,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private companion object {
+    companion object {
         fun initialUiState() = HomeContract.UiState(
             isStartButton = true,
             hikingPhotos = listOf(),
